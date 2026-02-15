@@ -1,0 +1,153 @@
+---
+title: "ExecutionContext"
+description: "Manage workflow variables, interpolation, JSONPath, and node output storage."
+---
+
+## Overview
+
+`ExecutionContext` is the runtime state container for workflow execution. It stores variables, resolves template expressions, and tracks node outputs.
+
+```typescript
+import { ExecutionContext } from '@jam-nodes/core';
+
+const ctx = new ExecutionContext({ user: { name: 'Alice' }, items: [1, 2, 3] });
+```
+
+## Variable Management
+
+### setVariable / getVariable
+
+```typescript
+ctx.setVariable('count', 42);
+ctx.getVariable('count'); // 42
+```
+
+### hasVariable / deleteVariable
+
+```typescript
+ctx.hasVariable('count'); // true
+ctx.deleteVariable('count');
+```
+
+### getAllVariables / clearAll / mergeVariables
+
+```typescript
+ctx.getAllVariables();  // Returns a copy of all variables
+ctx.mergeVariables({ a: 1, b: 2 });
+ctx.clearAll();
+```
+
+## Interpolation
+
+### interpolate
+
+Resolves `{{variable}}` references in strings. If the entire string is a single reference, returns the actual value (not stringified).
+
+```typescript
+ctx.interpolate('Hello {{user.name}}');  // "Hello Alice"
+ctx.interpolate('{{items}}');            // [1, 2, 3] (actual array)
+```
+
+### interpolateObject
+
+Recursively interpolates all strings in an object or array.
+
+```typescript
+ctx.interpolateObject({
+  greeting: 'Hello {{user.name}}',
+  data: '{{items}}',
+});
+// { greeting: 'Hello Alice', data: [1, 2, 3] }
+```
+
+<Tip>
+  Use `interpolateObject` with `prepareNodeInput` to resolve all `{{var}}` references in node configuration before execution.
+</Tip>
+
+## Path Resolution
+
+### evaluateJsonPath
+
+Evaluate JSONPath expressions against the variable store.
+
+```typescript
+ctx.evaluateJsonPath('$.user.name');  // "Alice"
+```
+
+<Note>
+  Single results are automatically unwrapped from arrays.
+</Note>
+
+### resolveNestedPath
+
+Resolve dot-notation paths including array indices.
+
+```typescript
+ctx.resolveNestedPath('user.name');     // "Alice"
+ctx.resolveNestedPath('items[0]');      // 1
+```
+
+## Node Output Storage
+
+### storeNodeOutput
+
+Stores a node's output and merges object keys to the root variable scope.
+
+```typescript
+ctx.storeNodeOutput('search', { contacts: [{ name: 'Bob' }] });
+ctx.getVariable('contacts');  // [{ name: 'Bob' }]
+```
+
+### getNodeOutput
+
+Retrieve a specific node's stored output.
+
+```typescript
+ctx.getNodeOutput('search');  // { contacts: [{ name: 'Bob' }] }
+```
+
+## Context Conversion
+
+### toNodeContext
+
+Create a `NodeExecutionContext` for passing to node executors.
+
+```typescript
+const nodeCtx = ctx.toNodeContext('user-123', 'wf-456', 'campaign-789');
+```
+
+### Serialization
+
+```typescript
+const json = ctx.toJSON();                    // Export variables
+const restored = ExecutionContext.fromJSON(json);  // Restore from JSON
+```
+
+## Factory Functions
+
+```typescript
+import { createExecutionContext } from '@jam-nodes/core';
+
+const ctx = createExecutionContext({ key: 'value' });
+```
+
+## All Methods
+
+| Method | Signature | Description |
+|--------|-----------|-------------|
+| `setVariable` | `(name: string, value: unknown): void` | Set a variable |
+| `getVariable` | `(name: string): unknown` | Get a variable |
+| `getAllVariables` | `(): Record<string, unknown>` | Get copy of all variables |
+| `hasVariable` | `(name: string): boolean` | Check if variable exists |
+| `deleteVariable` | `(name: string): void` | Delete a variable |
+| `clearAll` | `(): void` | Clear all variables |
+| `mergeVariables` | `(vars: Record<string, unknown>): void` | Merge multiple variables |
+| `evaluateJsonPath` | `(path: string): unknown` | Evaluate JSONPath expression |
+| `interpolate` | `(template: string): unknown` | Interpolate `{{var}}` in string |
+| `interpolateObject` | `<T>(obj: T): T` | Recursively interpolate object |
+| `resolveNestedPath` | `(path: string): unknown` | Resolve dot-notation path |
+| `storeNodeOutput` | `(nodeId: string, output: unknown): void` | Store node output |
+| `getNodeOutput` | `<T>(nodeId: string): T \| undefined` | Get stored node output |
+| `toNodeContext` | `(userId, workflowExecutionId, campaignId?): NodeExecutionContext` | Create executor context |
+| `toJSON` | `(): Record<string, unknown>` | Export variables |
+| `static fromJSON` | `(json): ExecutionContext` | Create from serialized data |

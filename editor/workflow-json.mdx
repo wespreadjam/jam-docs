@@ -1,0 +1,86 @@
+---
+title: "Workflow JSON"
+description: "The WorkflowJSON schema — nodes, edges, and metadata for import/export."
+---
+
+## WorkflowJSON
+
+The serialization format used by the editor for saving, exporting, and importing workflows.
+
+```typescript
+interface WorkflowJSON {
+  name: string;
+  description?: string;
+  nodes: WorkflowNodeJSON[];
+  edges: WorkflowEdgeJSON[];
+}
+```
+
+## WorkflowNodeJSON
+
+```typescript
+interface WorkflowNodeJSON {
+  id: string;                           // Unique node ID
+  type: string;                         // Node type (e.g. 'conditional')
+  position: { x: number; y: number };   // Canvas position
+  config: Record<string, unknown>;      // Node configuration (input values)
+}
+```
+
+## WorkflowEdgeJSON
+
+```typescript
+interface WorkflowEdgeJSON {
+  id: string;
+  source: string;        // Source node ID
+  sourceHandle: string;  // Output field name
+  target: string;        // Target node ID
+  targetHandle: string;  // Input field name
+}
+```
+
+## Example
+
+```json
+{
+  "name": "My Workflow",
+  "nodes": [
+    {
+      "id": "n1",
+      "type": "http_request",
+      "position": { "x": 100, "y": 100 },
+      "config": {
+        "url": "https://api.example.com",
+        "method": "GET"
+      }
+    },
+    {
+      "id": "n2",
+      "type": "filter",
+      "position": { "x": 400, "y": 100 },
+      "config": {
+        "path": "status",
+        "operator": "equals",
+        "value": "active"
+      }
+    }
+  ],
+  "edges": [
+    {
+      "id": "e1",
+      "source": "n1",
+      "sourceHandle": "body",
+      "target": "n2",
+      "targetHandle": "items"
+    }
+  ]
+}
+```
+
+<Note>
+  Edges connect output fields of one node to input fields of another. The `sourceHandle` and `targetHandle` correspond to field names from the node's output and input Zod schemas respectively.
+</Note>
+
+## Import / Export
+
+The editor toolbar provides download (export as `.json`) and upload (import from `.json`) buttons. Programmatically, use the `onChange` callback to capture the current workflow, or pass `initialWorkflow` to load one.

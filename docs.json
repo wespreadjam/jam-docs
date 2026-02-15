@@ -1,72 +1,37 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "jam-nodes",
   "colors": {
     "primary": "#D83A3A",
     "light": "#F10606",
     "dark": "#9C0041"
   },
-  "metadata": {
-    "og:image": "/images/og-image.png"
-  },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
-            "pages": [
-              "index",
-              "quickstart",
-              "development"
-            ]
+            "group": "Getting Started",
+            "pages": ["index", "quickstart", "creating-nodes"]
           },
           {
-            "group": "Customization",
-            "pages": [
-              "essentials/settings",
-              "essentials/navigation"
-            ]
+            "group": "Core API",
+            "pages": ["core/types", "core/registry", "core/execution-context", "core/utilities"]
           },
           {
-            "group": "Writing content",
-            "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
-            ]
+            "group": "Built-in Nodes",
+            "pages": ["nodes/overview", "nodes/logic", "nodes/transform", "nodes/integration", "nodes/ai"]
           },
           {
-            "group": "AI tools",
-            "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
-            ]
+            "group": "Visual Editor",
+            "pages": ["editor/overview", "editor/workflow-json", "editor/runner"]
           },
           {
-            "group": "Endpoint examples",
-            "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
-            ]
+            "group": "AI Integration",
+            "pages": ["mcp"]
           }
         ]
       }
@@ -74,12 +39,12 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs"
+          "anchor": "GitHub",
+          "href": "https://github.com/wespreadjam/jam-nodes"
         },
         {
-          "anchor": "Blog",
-          "href": "https://mintlify.com/blog"
+          "anchor": "npm",
+          "href": "https://www.npmjs.com/org/jam-nodes"
         }
       ]
     }
@@ -90,35 +55,18 @@
     "height": 40
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
-      }
-    ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "GitHub",
+      "href": "https://github.com/wespreadjam/jam-nodes"
     }
   },
   "contextual": {
-    "options": [
-     "copy",
-     "view",
-     "chatgpt",
-     "claude",
-     "perplexity",
-     "mcp",
-     "cursor",
-     "vscode"
-   ]
+    "options": ["copy", "view", "chatgpt", "claude", "cursor", "mcp"]
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "github": "https://github.com/wespreadjam/jam-nodes"
     }
   }
 }

@@ -1,87 +1,53 @@
 ---
-title: "Introduction"
-description: "Welcome to the new home for your documentation"
+title: "jam-nodes"
+description: "An extensible, type-safe workflow node framework for building automation pipelines in TypeScript."
 ---
 
-## Setting up
+## What is jam-nodes?
 
-Get your documentation site up and running in minutes.
+jam-nodes is a modular framework for building automation workflows in TypeScript. It provides typed node definitions with Zod schema validation, a registry for managing nodes, an execution context with variable interpolation, and a visual drag-and-drop editor.
 
-<Card
-  title="Start here"
-  href="/quickstart"
-  horizontal
->
-  Follow our three step quickstart guide.
-</Card>
+## Architecture
 
-## Make it yours
+```
+@jam-nodes/core     → Types, NodeRegistry, ExecutionContext, defineNode utility
+@jam-nodes/nodes    → Built-in node definitions (logic, transform, AI, integrations)
+@jam-nodes/editor   → React visual editor, WorkflowRunner, schema introspection
+```
 
-Design a docs site that looks great and empowers your users.
+<Note>
+  **core** is dependency-free (except Zod + jsonpath-plus). **nodes** depends on core. **editor** depends on core + React + @xyflow/react.
+</Note>
 
-<Columns cols={2}>
-  <Card
-    title="Edit locally"
-    href="/development"
-  >
-    Edit your docs locally and preview them in real time.
+## Explore the Docs
+
+<CardGroup cols={2}>
+  <Card title="Quick Start" icon="rocket" href="/quickstart">
+    Install packages, create a registry, and run your first node in minutes.
   </Card>
-  <Card
-    title="Customize your site"
-    href="/essentials/settings"
-  >
-    Customize the design and colors of your site to match your brand.
+  <Card title="Core API" icon="cube" href="/core/types">
+    Types, registry, execution context, and utility functions.
   </Card>
-    <Card
-    title="Set up navigation"
-    href="/essentials/navigation"
-  >
-    Organize your docs to help users find what they need and succeed with your product.
+  <Card title="Built-in Nodes" icon="puzzle-piece" href="/nodes/overview">
+    16 ready-to-use nodes for logic, transforms, integrations, and AI.
   </Card>
-  <Card
-    title="API documentation"
-    href="/api-reference/introduction"
-  >
-    Auto-generate API documentation from OpenAPI specifications.
+  <Card title="Visual Editor" icon="paintbrush" href="/editor/overview">
+    Drag-and-drop React workflow editor with live execution.
   </Card>
-</Columns>
+  <Card title="Create Custom Nodes" icon="hammer" href="/creating-nodes">
+    Build your own nodes with Zod schemas and register them with the editor.
+  </Card>
+  <Card title="MCP Integration" icon="robot" href="/mcp">
+    Connect AI agents to jam-nodes documentation via MCP servers.
+  </Card>
+</CardGroup>
 
-## Create beautiful pages
+## Key Features
 
-Everything you need to create world-class documentation.
-
-<Columns cols={2}>
-  <Card
-    title="Write with MDX"
-    href="/essentials/markdown"
-  >
-    Use MDX to style your docs pages.
-  </Card>
-  <Card
-    title="Code samples"
-    href="/essentials/code"
-  >
-    Add sample code to demonstrate how to use your product.
-  </Card>
-  <Card
-    title="Images"
-    href="/essentials/images"
-  >
-    Display images and other media.
-  </Card>
-  <Card
-    title="Reusable snippets"
-    href="/essentials/reusable-snippets"
-  >
-    Write once and reuse across your docs.
-  </Card>
-</Columns>
-
-## Need inspiration?
-
-<Card
-  title="See complete examples"
-  href="https://mintlify.com/customers"
->
-  Browse our showcase of exceptional documentation sites.
-</Card>
+- **Type-safe** — Zod schemas for all inputs and outputs with full TypeScript inference
+- **Extensible** — Create custom nodes with `defineNode` and register them
+- **Visual** — React-based drag-and-drop workflow editor
+- **Variable interpolation** — `{{variable}}` syntax with JSONPath and nested path resolution
+- **Service injection** — Nodes access external APIs through a clean services interface
+- **Approval workflows** — Built-in support for human-in-the-loop approval
+- **Notifications** — Nodes can emit notifications through configurable channels

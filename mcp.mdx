@@ -1,0 +1,105 @@
+---
+title: "MCP Integration"
+description: "Connect AI agents to jam-nodes documentation via Model Context Protocol servers."
+---
+
+## Overview
+
+jam-nodes documentation is available to AI agents through two MCP (Model Context Protocol) servers:
+
+1. **Mintlify hosted MCP** — built into the docs site
+2. **Standalone MCP server** — installable npm package
+
+## Mintlify Hosted MCP
+
+The docs site includes a built-in MCP server at the `/mcp` path. This is the easiest way to connect AI agents.
+
+### Configuration
+
+<CodeGroup>
+```json Claude Desktop
+{
+  "mcpServers": {
+    "jam-nodes-docs": {
+      "type": "sse",
+      "url": "https://docs.spreadjam.com/mcp"
+    }
+  }
+}
+```
+```json Cursor
+{
+  "mcpServers": {
+    "jam-nodes-docs": {
+      "type": "sse",
+      "url": "https://docs.spreadjam.com/mcp"
+    }
+  }
+}
+```
+</CodeGroup>
+
+<Tip>
+  The Mintlify MCP server automatically indexes all documentation pages and provides search, retrieval, and context tools.
+</Tip>
+
+## Standalone MCP Server
+
+The `jam-nodes-docs-mcp` npm package provides a standalone MCP server with stdio transport, giving AI agents direct access to jam-nodes documentation.
+
+### Installation
+
+```bash
+npm install -g jam-nodes-docs-mcp
+```
+
+Or run directly:
+
+```bash
+npx jam-nodes-docs-mcp
+```
+
+### Configuration
+
+<CodeGroup>
+```json Claude Desktop
+{
+  "mcpServers": {
+    "jam-nodes-docs": {
+      "command": "npx",
+      "args": ["jam-nodes-docs-mcp"]
+    }
+  }
+}
+```
+```json Cursor
+{
+  "mcpServers": {
+    "jam-nodes-docs": {
+      "command": "npx",
+      "args": ["jam-nodes-docs-mcp"]
+    }
+  }
+}
+```
+```json OpenClaw
+{
+  "jam-nodes-docs": {
+    "command": "npx",
+    "args": ["jam-nodes-docs-mcp"]
+  }
+}
+```
+</CodeGroup>
+
+### Tools
+
+The standalone MCP server exposes 5 tools:
+
+| Tool | Description |
+|------|-------------|
+| `search_docs` | Keyword search across all documentation |
+| `get_node_info` | Full docs for a specific node by type (e.g. `http_request`) |
+| `list_nodes` | List all 16 built-in nodes with descriptions |
+| `get_api_reference` | API docs for core types, registry, execution context, editor |
+| `get_guide` | Get the creating-nodes guide or quick start |

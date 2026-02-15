@@ -1,0 +1,51 @@
+---
+title: "Built-in Nodes Overview"
+description: "All 16 built-in nodes grouped by category."
+---
+
+## Installation
+
+```bash
+npm install @jam-nodes/nodes
+```
+
+```typescript
+import { builtInNodes } from '@jam-nodes/nodes';
+registry.registerAll(builtInNodes);
+```
+
+## Logic Nodes
+
+| Node | Type | Description |
+|------|------|-------------|
+| [Conditional](/nodes/logic#conditional) | `conditional` | Branch workflow based on a condition |
+| [End](/nodes/logic#end) | `end` | Mark the end of a workflow branch |
+| [Delay](/nodes/logic#delay) | `delay` | Pause execution for a specified duration |
+
+## Transform Nodes
+
+| Node | Type | Description |
+|------|------|-------------|
+| [Map](/nodes/transform#map) | `map` | Extract a property from each item in an array |
+| [Filter](/nodes/transform#filter) | `filter` | Filter array items based on a condition |
+
+## Integration Nodes
+
+| Node | Type | Services | Description |
+|------|------|----------|-------------|
+| [HTTP Request](/nodes/integration#http_request) | `http_request` | None | Make HTTP requests to external APIs |
+| [Reddit Monitor](/nodes/integration#reddit_monitor) | `reddit_monitor` | None | Search Reddit posts by keywords |
+| [Twitter Monitor](/nodes/integration#twitter_monitor) | `twitter_monitor` | `twitter` | Search Twitter/X posts by keywords |
+| [LinkedIn Monitor](/nodes/integration#linkedin_monitor) | `linkedin_monitor` | `forumScout` | Search LinkedIn posts via ForumScout |
+| [Search Contacts](/nodes/integration#search_contacts) | `search_contacts` | `apollo` | Search contacts via Apollo.io |
+| [Draft Emails](/nodes/integration#draft_emails) | `draft_emails` | `anthropic`, `emailDrafts` | Generate personalized email drafts |
+
+## AI Nodes
+
+| Node | Type | Services | Description |
+|------|------|----------|-------------|
+| [Social AI Analyze](/nodes/ai#social_ai_analyze) | `social_ai_analyze` | `anthropic` | Analyze posts for relevance and sentiment |
+| [Sora Video](/nodes/ai#sora_video) | `sora_video` | `openai` | Generate AI video with OpenAI Sora |
+| [SEO Keyword Research](/nodes/ai#seo_keyword_research) | `seo_keyword_research` | `dataForSeo` | Research keywords with volume and difficulty |
+| [SEO Audit](/nodes/ai#seo_audit) | `seo_audit` | `dataForSeo` | Run comprehensive SEO audit on a URL |
+| [Social Keyword Generator](/nodes/ai#social_keyword_generator) | `social_keyword_generator` | `anthropic` | Generate platform-specific search keywords |

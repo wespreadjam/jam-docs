@@ -1,0 +1,75 @@
+---
+title: "Transform Nodes"
+description: "Data manipulation nodes — map and filter arrays."
+---
+
+## map
+
+Extract a property from each item in an array.
+
+- **Category:** `transform`
+- **Estimated Duration:** 0s
+- **Capabilities:** `supportsRerun`
+
+### Input
+
+<ParamField body="items" type="unknown[]" required>
+  Array of items to transform.
+</ParamField>
+<ParamField body="path" type="string" required>
+  Property path to extract (dot notation).
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `results` | `unknown[]` | Extracted values |
+| `count` | `number` | Number of results |
+
+### Example
+
+```typescript
+{ items: '{{contacts}}', path: 'email' }
+// → { results: ['a@example.com', 'b@example.com'], count: 2 }
+```
+
+---
+
+## filter
+
+Filter items in an array based on a condition.
+
+- **Category:** `transform`
+- **Estimated Duration:** 0s
+- **Capabilities:** `supportsRerun`
+
+### Input
+
+<ParamField body="items" type="unknown[]" required>
+  Array to filter.
+</ParamField>
+<ParamField body="path" type="string" required>
+  Property path to check (dot notation).
+</ParamField>
+<ParamField body="operator" type="enum" required>
+  `'equals'` | `'not_equals'` | `'contains'` | `'not_contains'` | `'greater_than'` | `'less_than'` | `'exists'` | `'not_exists'`
+</ParamField>
+<ParamField body="value" type="unknown">
+  Value to compare against.
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `results` | `unknown[]` | Filtered items |
+| `count` | `number` | Filtered count |
+| `originalCount` | `number` | Original array length |
+
+### Example
+
+```typescript
+{ items: '{{contacts}}', path: 'email', operator: 'exists' }
+// Keeps only contacts that have an email field
+```
