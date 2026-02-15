@@ -1,19 +1,7 @@
-<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-<path d="M9.06145 23.1079C5.26816 22.3769 -3.39077 20.6274 1.4173 5.06384C9.6344 6.09939 16.9728 14.0644 9.06145 23.1079Z" fill="url(#paint0_linear_17557_2021)"/>
-<path d="M8.91928 23.0939C5.27642 21.2223 0.78371 4.20891 17.0071 0C20.7569 7.19341 19.6212 16.5452 8.91928 23.0939Z" fill="url(#paint1_linear_17557_2021)"/>
-<path d="M8.91388 23.0788C8.73534 19.8817 10.1585 9.08525 23.5699 13.1107C23.1812 20.1229 18.984 26.4182 8.91388 23.0788Z" fill="url(#paint2_linear_17557_2021)"/>
-<defs>
-<linearGradient id="paint0_linear_17557_2021" x1="3.77557" y1="5.91571" x2="5.23185" y2="21.5589" gradientUnits="userSpaceOnUse">
-<stop stop-color="#18E299"/>
-<stop offset="1" stop-color="#15803D"/>
-</linearGradient>
-<linearGradient id="paint1_linear_17557_2021" x1="12.1711" y1="-0.718425" x2="10.1897" y2="22.9832" gradientUnits="userSpaceOnUse">
-<stop stop-color="#16A34A"/>
-<stop offset="1" stop-color="#4ADE80"/>
-</linearGradient>
-<linearGradient id="paint2_linear_17557_2021" x1="23.1327" y1="15.353" x2="9.33841" y2="18.5196" gradientUnits="userSpaceOnUse">
-<stop stop-color="#4ADE80"/>
-<stop offset="1" stop-color="#0D9373"/>
-</linearGradient>
-</defs>
+<svg width="189" height="217" viewBox="0 0 189 217" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M0 181.623C0 162.083 15.8404 146.242 35.3804 146.242H94.3478V217.003H35.3804C15.8403 217.003 0 201.163 0 181.623V181.623Z" fill="#D83A3A"/>
+<path d="M188.698 181.621C188.698 201.161 172.858 217.001 153.317 217.001L94.35 217.001L94.3501 146.241L153.317 146.241C172.858 146.241 188.698 162.081 188.698 181.621V181.621Z" fill="#F10606"/>
+<path d="M188.698 108.503C188.698 129.346 171.801 146.242 150.959 146.242L94.35 146.242L94.3501 70.7639L150.959 70.764C171.802 70.764 188.698 87.6603 188.698 108.503V108.503Z" fill="#9C0041"/>
+<rect x="188.698" y="70.7612" width="188.696" height="70.7608" rx="35.3804" transform="rotate(-180 188.698 70.7612)" fill="#710544"/>
+<rect x="94.3489" y="146.242" width="94.3478" height="75.4782" rx="37.7391" transform="rotate(-180 94.3489 146.242)" fill="#BA0849"/>
 </svg>
