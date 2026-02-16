@@ -1,0 +1,86 @@
+---
+title: "Utilities"
+description: "Helper functions for defining nodes and preparing inputs."
+---
+
+## defineNode
+
+Type-safe helper for creating node definitions. Returns a `NodeDefinition` with full TypeScript inference from your Zod schemas.
+
+```typescript
+import { defineNode } from '@jam-nodes/core';
+import { z } from 'zod';
+
+export const myNode = defineNode({
+  type: 'my_node',
+  name: 'My Node',
+  description: 'Does something useful',
+  category: 'action',
+  inputSchema: z.object({ message: z.string() }),
+  outputSchema: z.object({ result: z.string() }),
+  estimatedDuration: 5,
+  capabilities: {
+    supportsRerun: true,
+  },
+  executor: async (input) => ({
+    success: true,
+    output: { result: `Processed: ${input.message}` },
+  }),
+});
+```
+
+### DefineNodeConfig
+
+<ParamField body="type" type="string" required>
+  Unique identifier used in workflows.
+</ParamField>
+<ParamField body="name" type="string" required>
+  Display name shown in the editor.
+</ParamField>
+<ParamField body="description" type="string" required>
+  Description shown in the node palette.
+</ParamField>
+<ParamField body="category" type="NodeCategory" required>
+  `'action'` | `'logic'` | `'integration'` | `'transform'`
+</ParamField>
+<ParamField body="inputSchema" type="z.ZodSchema<TInput>" required>
+  Zod schema for input validation.
+</ParamField>
+<ParamField body="outputSchema" type="z.ZodSchema<TOutput>" required>
+  Zod schema for output validation.
+</ParamField>
+<ParamField body="executor" type="NodeExecutor<TInput, TOutput>" required>
+  Async function implementing the node's logic.
+</ParamField>
+<ParamField body="estimatedDuration" type="number">
+  Estimated execution time in seconds.
+</ParamField>
+<ParamField body="capabilities" type="NodeCapabilities">
+  Feature flags (`supportsRerun`, `supportsCancel`, etc.).
+</ParamField>
+
+## prepareNodeInput
+
+Resolves all `{{variable}}` references in a node's configuration object using an `ExecutionContext`.
+
+```typescript
+import { prepareNodeInput, ExecutionContext } from '@jam-nodes/core';
+
+const ctx = new ExecutionContext({
+  apiUrl: 'https://api.example.com',
+  token: 'abc123',
+});
+
+const resolvedInput = prepareNodeInput(
+  {
+    url: '{{apiUrl}}/users',
+    headers: { Authorization: 'Bearer {{token}}' },
+  },
+  ctx
+);
+// { url: 'https://api.example.com/users', headers: { Authorization: 'Bearer abc123' } }
+```
+
+<Note>
+  `prepareNodeInput` calls `context.interpolateObject(nodeSettings)` internally. It's a convenience wrapper for the common pattern of resolving node config before execution.
+</Note>

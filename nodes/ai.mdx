@@ -1,0 +1,202 @@
+---
+title: "AI Nodes"
+description: "AI-powered nodes — social analysis, video generation, SEO research, and keyword generation."
+---
+
+## social_ai_analyze
+
+Analyze social media posts for relevance, sentiment, complaints, and urgency using Claude.
+
+- **Category:** `action`
+- **Estimated Duration:** 60s
+- **Capabilities:** `supportsRerun`, `supportsBulkActions`
+- **Services:** <Warning>**Required:** `anthropic`</Warning> Optional `analyzedPosts`, `notifications`
+
+### Input
+
+<ParamField body="topic" type="string" required>
+  Original topic for context.
+</ParamField>
+<ParamField body="userIntent" type="string" required>
+  What the user is looking for.
+</ParamField>
+<ParamField body="twitterPosts" type="SocialPost[]">
+  Posts from Twitter monitor.
+</ParamField>
+<ParamField body="redditPosts" type="SocialPost[]">
+  Posts from Reddit monitor.
+</ParamField>
+<ParamField body="linkedinPosts" type="SocialPost[]">
+  Posts from LinkedIn monitor.
+</ParamField>
+<ParamField body="posts" type="SocialPost[]">
+  Legacy field (backwards compat).
+</ParamField>
+<ParamField body="monitoringConfigId" type="string">
+  For storage service.
+</ParamField>
+
+<Accordion title="SocialPost shape">
+```typescript
+{
+  id: string;
+  platform: string;
+  url: string;
+  text: string;
+  title?: string;
+  authorName: string;
+  authorHandle: string;
+  authorUrl: string;
+  authorFollowers?: number;
+  engagement: { likes: number; comments: number; shares: number; views?: number };
+  postedAt: string;
+}
+```
+</Accordion>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `analyzedPosts` | `AnalyzedPost[]` | All analyzed posts (sorted by relevance desc) |
+| `highPriorityPosts` | `AnalyzedPost[]` | Posts with urgency=high or relevance≥80 |
+| `complaints` | `AnalyzedPost[]` | Posts flagged as complaints |
+| `totalAnalyzed` | `number` | Count |
+| `highPriorityCount` | `number` | Count |
+| `complaintCount` | `number` | Count |
+| `averageRelevance` | `number` | Average relevance score |
+
+<Accordion title="AnalyzedPost fields">
+Extends `SocialPost` with: `relevanceScore`, `sentiment` (`'positive'`|`'negative'`|`'neutral'`), `isComplaint`, `urgencyLevel` (`'low'`|`'medium'`|`'high'`), `aiSummary`, `matchedKeywords`.
+</Accordion>
+
+---
+
+## sora_video
+
+Generate AI video using OpenAI Sora 2.
+
+- **Category:** `integration`
+- **Estimated Duration:** 60s
+- **Capabilities:** `supportsRerun`
+- **Services:** <Warning>**Required:** `openai`</Warning>
+
+### Input
+
+<ParamField body="prompt" type="string" required>
+  Video description.
+</ParamField>
+<ParamField body="model" type="enum" default="sora-2">
+  `'sora-2'` | `'sora-2-pro'`
+</ParamField>
+<ParamField body="seconds" type="4 | 8 | 12" default="4">
+  Video duration.
+</ParamField>
+<ParamField body="size" type="enum" default="1280x720">
+  `'720x1280'` | `'1280x720'` | `'1024x1792'` | `'1792x1024'`
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `video` | `object` | `{ url, durationSeconds, size, model }` |
+| `processingTimeSeconds` | `number` | Time taken to generate |
+
+---
+
+## seo_keyword_research
+
+Research keywords with search volume, difficulty, CPC, and intent data.
+
+- **Category:** `integration`
+- **Estimated Duration:** 10s
+- **Capabilities:** `supportsRerun`
+- **Services:** <Warning>**Required:** `dataForSeo`</Warning>
+
+### Input
+
+<ParamField body="seedKeywords" type="string[]" required>
+  Seed keywords to research.
+</ParamField>
+<ParamField body="locationCode" type="number" default="2840">
+  Location code (default: US).
+</ParamField>
+<ParamField body="languageCode" type="string" default="en">
+  Language code.
+</ParamField>
+<ParamField body="limit" type="number" default="30">
+  Max keywords per seed.
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `keywords` | `array` | `{ keyword, searchVolume, keywordDifficulty, cpc, searchIntent }` |
+| `totalResearched` | `number` | Total keywords returned |
+
+`searchIntent` values: `'informational'` | `'commercial'` | `'navigational'` | `'transactional'`
+
+---
+
+## seo_audit
+
+Run comprehensive SEO audit on a URL.
+
+- **Category:** `integration`
+- **Estimated Duration:** 30s
+- **Capabilities:** `supportsRerun`
+- **Services:** <Warning>**Required:** `dataForSeo`</Warning> Optional `notifications`
+
+### Input
+
+<ParamField body="url" type="string (URL)">
+  URL to audit. Can also come from `context.variables.site_url`.
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `overallScore` | `number \| null` | SEO score 0–100 |
+| `issues` | `array` | `{ id, title, description, score, displayValue? }` |
+| `passedAudits` | `number` | Count of passed checks |
+| `failedAudits` | `number` | Count of failed checks |
+| `url` | `string \| null` | Audited URL |
+| `meta` | `object?` | `{ title?, description?, canonical?, htags? }` |
+| `performance` | `object?` | `{ timeToInteractive?, largestContentfulPaint?, domComplete? }` |
+| `links` | `object?` | `{ internal, external, broken }` |
+| `resources` | `object?` | `{ images, scripts, stylesheets }` |
+| `content` | `object?` | `{ wordCount, textRatio, readabilityScore? }` |
+| `extractedKeywords` | `string[]?` | Keywords found on page |
+
+---
+
+## social_keyword_generator
+
+Generate platform-specific search keywords from a topic description using Claude.
+
+- **Category:** `action`
+- **Estimated Duration:** 15s
+- **Capabilities:** `supportsRerun`
+- **Services:** <Warning>**Required:** `anthropic`</Warning> Optional `notifications`
+
+### Input
+
+<ParamField body="topic" type="string" required>
+  Natural language topic description.
+</ParamField>
+<ParamField body="userKeywords" type="string[]">
+  User-specified keywords to include.
+</ParamField>
+
+### Output
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `topic` | `string` | Echo of input topic |
+| `twitter` | `object` | `{ keywords: string[], searchQuery: string }` |
+| `reddit` | `object` | `{ keywords: string[] }` |
+| `linkedin` | `object` | `{ keywords: string[], searchQueries: string[] }` |
+| `allKeywords` | `string[]` | All unique keywords across platforms |

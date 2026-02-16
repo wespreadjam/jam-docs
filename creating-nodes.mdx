@@ -1,0 +1,193 @@
+---
+title: "Creating Custom Nodes"
+description: "Step-by-step guide to building, testing, and registering custom nodes."
+---
+
+## Overview
+
+Creating a custom node involves defining Zod schemas for inputs and outputs, implementing an executor function, and registering the node with the registry.
+
+<Steps>
+
+## Define Schemas with Zod
+
+```typescript
+import { z } from 'zod';
+
+const MyInputSchema = z.object({
+  query: z.string(),
+  limit: z.number().min(1).max(100).default(10),
+  includeMetadata: z.boolean().optional(),
+});
+
+const MyOutputSchema = z.object({
+  results: z.array(z.object({
+    id: z.string(),
+    title: z.string(),
+    score: z.number(),
+  })),
+  totalCount: z.number(),
+});
+```
+
+<Tip>
+**Schema design tips:**
+- `.optional()` for non-required fields
+- `.default(value)` for defaults (rendered as optional in the editor UI)
+- `z.enum([...])` for dropdowns in the editor
+- `.describe('...')` for field descriptions (used by schema introspector)
+- Nested `z.object()` creates collapsible sections in the config panel
+</Tip>
+
+## Create the Node with defineNode
+
+```typescript
+import { defineNode } from '@jam-nodes/core';
+
+export const mySearchNode = defineNode({
+  type: 'my_search',
+  name: 'My Search',
+  description: 'Search for items matching a query',
+  category: 'integration',
+  inputSchema: MyInputSchema,
+  outputSchema: MyOutputSchema,
+  estimatedDuration: 10,
+  capabilities: {
+    supportsRerun: true,
+    supportsCancel: true,
+  },
+  executor: async (input, context) => {
+    try {
+      const results = await doSearch(input.query, input.limit);
+      return {
+        success: true,
+        output: { results, totalCount: results.length },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Search failed',
+      };
+    }
+  },
+});
+```
+
+## Choose a Category
+
+| Category | Use For |
+|----------|---------|
+| `action` | AI generation, email drafting, content creation |
+| `logic` | Conditionals, delays, flow control, end markers |
+| `integration` | External APIs (HTTP, Apollo, DataForSEO, social platforms) |
+| `transform` | Data manipulation (map, filter, reshape) |
+
+## Use Services
+
+Nodes access external services via `context.services`. Always check availability:
+
+```typescript
+executor: async (input, context) => {
+  if (!context.services?.apollo) {
+    return { success: false, error: 'Apollo service not configured.' };
+  }
+  const contacts = await context.services.apollo.searchContacts({ ... });
+  return { success: true, output: { contacts } };
+}
+```
+
+Available services: `apollo`, `dataForSeo`, `twitter`, `forumScout`, `openai`, `anthropic`, `notifications`, `storage`, `cache`, `emailDrafts`, `analyzedPosts`.
+
+## Use ExecutionContext Features
+
+```typescript
+executor: async (input, context) => {
+  // User and workflow info
+  context.userId;
+  context.workflowExecutionId;
+  context.campaignId;
+
+  // Access upstream node outputs
+  const prevData = context.variables['previousNodeId'];
+  const nested = context.resolveNestedPath('contacts[0].email');
+
+  return {
+    success: true,
+    output: { /* ... */ },
+
+    // Optional: conditional branching
+    nextNodeId: someCondition ? 'nodeA' : 'nodeB',
+
+    // Optional: request approval
+    needsApproval: {
+      resourceIds: ['id1'],
+      resourceType: 'email_draft',
+      message: 'Please review',
+    },
+
+    // Optional: notification
+    notification: {
+      title: 'Complete',
+      message: 'Found 42 results',
+    },
+  };
+}
+```
+
+## Register the Node
+
+```typescript
+import { NodeRegistry } from '@jam-nodes/core';
+import { builtInNodes } from '@jam-nodes/nodes';
+import { mySearchNode } from './my-search-node';
+
+const registry = new NodeRegistry();
+registry.registerAll(builtInNodes);
+registry.register(mySearchNode);
+
+// The editor auto-generates palette entry, config panel, and connection handles
+<WorkflowEditor registry={registry} />
+```
+
+## Test the Node
+
+```typescript
+import { createExecutionContext } from '@jam-nodes/core';
+import { mySearchNode } from './my-search-node';
+
+const ctx = createExecutionContext({ previousData: 'hello' });
+const nodeContext = ctx.toNodeContext('test-user', 'test-run');
+nodeContext.services = { /* mock services */ } as any;
+
+const result = await mySearchNode.executor(
+  { query: 'test', limit: 5 },
+  nodeContext
+);
+
+expect(result.success).toBe(true);
+expect(result.output?.totalCount).toBeGreaterThan(0);
+
+// Schema validation
+const validated = mySearchNode.inputSchema.parse({ query: 'test' });
+expect(() => mySearchNode.inputSchema.parse({})).toThrow();
+```
+
+</Steps>
+
+## File Organization
+
+```
+packages/nodes/src/
+  my-category/
+    my-node.ts          # Node definition + schemas
+    index.ts            # Re-exports
+  index.ts              # Add to builtInNodes array + re-export
+```
+
+For AI nodes with prompts:
+
+```
+schemas/ai.ts           # Zod schemas shared between nodes
+prompts/my-node.ts      # Prompt templates and helpers
+ai/my-node.ts           # Node definition using schemas + prompts
+```
