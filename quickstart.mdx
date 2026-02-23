@@ -17,12 +17,6 @@ pnpm add @jam-nodes/core @jam-nodes/nodes zod
 ```
 </CodeGroup>
 
-For the visual editor, also install:
-
-```bash
-npm install @jam-nodes/editor @xyflow/react react react-dom
-```
-
 ## Basic Usage
 
 **1. Create a Registry**
@@ -67,31 +61,6 @@ const input = ctx.interpolateObject({
 // { url: 'https://api.example.com/users', method: 'GET' }
 ```
 
-## Visual Editor Setup
-
-```tsx
-import { WorkflowEditor } from '@jam-nodes/editor';
-import { NodeRegistry } from '@jam-nodes/core';
-import { builtInNodes } from '@jam-nodes/nodes';
-
-const registry = new NodeRegistry();
-registry.registerAll(builtInNodes);
-
-function App() {
-  return (
-    <WorkflowEditor
-      registry={registry}
-      storageKey="my-workflow"
-      onChange={(wf) => console.log('Updated:', wf)}
-    />
-  );
-}
-```
-
-<Tip>
-  When `storageKey` is provided, the editor auto-saves to `localStorage` so workflows persist across page reloads.
-</Tip>
-
 ## Next Steps
 
 <CardGroup cols={2}>
@@ -104,7 +73,7 @@ function App() {
   <Card title="Create Custom Nodes" icon="hammer" href="/creating-nodes">
     Build and register your own nodes.
   </Card>
-  <Card title="Visual Editor" icon="paintbrush" href="/editor/overview">
-    Learn about the drag-and-drop editor.
+  <Card title="Playground" icon="terminal" href="/playground/overview">
+    Test nodes interactively with the CLI or web playground.
   </Card>
 </CardGroup>

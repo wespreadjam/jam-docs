@@ -33,8 +33,8 @@ const MyOutputSchema = z.object({
 <Tip>
 **Schema design tips:**
 - `.optional()` for non-required fields
-- `.default(value)` for defaults (rendered as optional in the editor UI)
-- `z.enum([...])` for dropdowns in the editor
+- `.default(value)` for defaults (rendered as optional in generated forms)
+- `z.enum([...])` for dropdowns in generated forms
 - `.describe('...')` for field descriptions (used by schema introspector)
 - Nested `z.object()` creates collapsible sections in the config panel
 </Tip>
@@ -145,8 +145,8 @@ const registry = new NodeRegistry();
 registry.registerAll(builtInNodes);
 registry.register(mySearchNode);
 
-// The editor auto-generates palette entry, config panel, and connection handles
-<WorkflowEditor registry={registry} />
+// Test with the CLI playground
+// jam run my_search --mock
 ```
 
 ## Test the Node

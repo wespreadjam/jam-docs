@@ -26,10 +26,6 @@
             "pages": ["nodes/overview", "nodes/logic", "nodes/transform", "nodes/integration", "nodes/ai"]
           },
           {
-            "group": "Visual Editor",
-            "pages": ["editor/overview", "editor/workflow-json", "editor/runner"]
-          },
-          {
             "group": "AI Integration",
             "pages": ["mcp"]
           },
