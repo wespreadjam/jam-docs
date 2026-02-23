@@ -1,0 +1,247 @@
+---
+title: "CLI Reference"
+description: "Command-line interface for testing jam-nodes interactively."
+---
+
+## Installation
+
+<CodeGroup>
+```bash npm (global)
+npm install -g @jam-nodes/playground
+```
+```bash npx (no install)
+npx @jam-nodes/playground <command>
+```
+```bash From source
+cd packages/playground
+npm run build && npm link
+```
+</CodeGroup>
+
+## Commands
+
+### `list`
+
+List all available jam-nodes.
+
+```bash
+jam list [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--category <cat>` | Filter by category: `logic`, `transform`, `integration`, `action` |
+| `--json` | Output as JSON |
+
+**Examples:**
+
+```bash
+# List all nodes
+jam list
+
+# Filter by category
+jam list --category logic
+jam list --category integration
+
+# JSON output for scripting
+jam list --json | jq '.[] | select(.category == "action")'
+```
+
+---
+
+### `run`
+
+Run a jam-node interactively.
+
+```bash
+jam run [node-type] [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-i, --input <json>` | JSON input data |
+| `--mock` | Return sample data without API calls |
+| `--no-confirm` | Skip confirmation prompt |
+
+**Examples:**
+
+```bash
+# Interactive mode (select node from list)
+jam run
+
+# Run with mock data (no credentials needed)
+jam run delay --mock
+
+# Run with JSON input
+jam run delay -i '{"durationMs": 1000}'
+
+# Run without confirmation
+jam run conditional --mock --no-confirm
+```
+
+<Note>
+When `--input` is not provided, the CLI prompts for each required field interactively.
+</Note>
+
+**Mock Mode:**
+
+Mock mode returns schema-valid sample data without making actual API calls. Use this to:
+- Explore node behavior without credentials
+- Test input validation
+- Generate example outputs for documentation
+
+```bash
+# All these work without any API keys
+jam run map --mock
+jam run filter --mock
+jam run conditional --mock
+```
+
+---
+
+### `init`
+
+Generate a `.env` template with all credential placeholders.
+
+```bash
+jam init [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--path <path>` | Output path (default: `./.env`) |
+| `--force` | Overwrite existing file |
+
+**Example:**
+
+```bash
+# Create .env template
+jam init
+
+# Custom location
+jam init --path ./config/.env
+
+# Overwrite existing
+jam init --force
+```
+
+The generated template includes placeholders for:
+- Apollo.io, Hunter.io
+- OpenAI, Anthropic
+- Twitter/X, Reddit, LinkedIn
+- DataForSEO, SendGrid, and more
+
+---
+
+### `credentials`
+
+Manage saved credentials.
+
+```bash
+jam credentials <subcommand>
+```
+
+| Subcommand | Description |
+|------------|-------------|
+| `list` | Show all saved credentials |
+| `path` | Show credential store location |
+| `set <service>` | Save credentials interactively |
+| `check <service>` | Check if credentials exist |
+| `delete <service>` | Remove saved credentials |
+| `clear` | Delete all saved credentials |
+
+**Examples:**
+
+```bash
+# List saved credentials
+jam credentials list
+
+# Show store location
+jam credentials path
+# Output: /Users/you/Library/Preferences/jam-nodes-playground-nodejs/config.json
+
+# Save credentials interactively
+jam credentials set apollo
+
+# Check if credentials exist
+jam credentials check apollo
+# Output: ✓ apollo credentials found (encrypted)
+
+# Delete specific credentials
+jam credentials delete apollo
+
+# Clear all
+jam credentials clear
+```
+
+---
+
+## Credential Sources
+
+The CLI checks credentials in this order:
+
+1. **Environment variables** - `JAM_<SERVICE>_API_KEY`
+2. **Encrypted local storage** - Saved via `credentials set`
+3. **Runtime prompt** - Asked during `run` if not found
+
+### Environment Variables
+
+| Service | Variable |
+|---------|----------|
+| Apollo.io | `JAM_APOLLO_API_KEY` |
+| Hunter.io | `JAM_HUNTER_API_KEY` |
+| OpenAI | `JAM_OPENAI_API_KEY` |
+| Anthropic | `JAM_ANTHROPIC_API_KEY` |
+| Twitter | `JAM_TWITTER_BEARER_TOKEN` |
+| Reddit | `JAM_REDDIT_CLIENT_ID`, `JAM_REDDIT_CLIENT_SECRET` |
+| LinkedIn | `JAM_LINKEDIN_ACCESS_TOKEN` |
+| DataForSEO | `JAM_DATAFORSEO_LOGIN`, `JAM_DATAFORSEO_PASSWORD` |
+| SendGrid | `JAM_SENDGRID_API_KEY` |
+
+<Tip>
+Use `jam init` to generate a template with all variables.
+</Tip>
+
+---
+
+## Error Handling
+
+The CLI provides clear error messages:
+
+```bash
+# Unknown node type
+jam run unknown_node
+# Error: Unknown node type: unknown_node
+# Use "jam list" to see available nodes
+
+# Invalid JSON
+jam run delay -i 'not json'
+# Error: Invalid JSON input
+
+# Missing required fields
+jam run conditional -i '{}'
+# Error: Required field "condition" is missing
+```
+
+---
+
+## Scripting
+
+Use JSON output and `jq` for scripting:
+
+```bash
+# Get all integration nodes
+jam list --json | jq '.[] | select(.category == "integration") | .type'
+
+# Count nodes by category
+jam list --json | jq 'group_by(.category) | map({category: .[0].category, count: length})'
+```
+
+---
+
+## Exit Codes
+
+| Code | Meaning |
+|------|---------|
+| `0` | Success |
+| `1` | Error (invalid input, missing credentials, execution failed) |

@@ -1,0 +1,200 @@
+---
+title: "Web Playground"
+description: "Browser-based interface for testing jam-nodes with auto-generated forms."
+---
+
+The Web Playground provides a visual interface for testing nodes, with auto-generated forms from Zod schemas.
+
+## Running Locally
+
+```bash
+# Clone the repo
+git clone https://github.com/wespreadjam/jam-nodes
+cd jam-nodes/packages/playground-web
+
+# Install dependencies
+npm install
+
+# Start development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) in your browser.
+
+## Features
+
+### Node Sidebar
+
+The collapsible sidebar lists all available nodes organized by category:
+
+- **Logic** - Conditional, Delay, End
+- **Transform** - Map, Filter
+- **Integration** - HTTP Request, Reddit Monitor, Twitter Monitor, etc.
+- **Action** - AI-powered nodes (Keyword Generator, Draft Emails, etc.)
+
+Click any node to select it and view its input form.
+
+### Auto-Generated Forms
+
+Input forms are automatically generated from each node's Zod schema. This means:
+
+- Required fields are marked with asterisks
+- Field types (string, number, array, object) render appropriate inputs
+- Validation happens in real-time
+- No manual UI development needed when adding new nodes
+
+### Mock Mode Toggle
+
+Toggle mock mode to test nodes without API credentials:
+
+- **Mock ON** - Returns schema-valid sample data
+- **Mock OFF** - Executes node with real API calls (requires credentials)
+
+<Tip>
+Start with mock mode to explore node inputs/outputs before configuring credentials.
+</Tip>
+
+### Output Viewer
+
+After execution, results display in a JSON viewer with:
+
+- Syntax highlighting
+- Expandable/collapsible sections
+- Copy to clipboard
+
+### Credential Management
+
+Click the credentials button to manage API keys:
+
+1. Select a service (Apollo, OpenAI, etc.)
+2. Enter your API key
+3. Keys are encrypted and stored in browser localStorage
+
+<Note>
+Browser-stored credentials are encrypted but less secure than environment variables. Use for development only.
+</Note>
+
+---
+
+## URL Structure
+
+Navigate directly to a node:
+
+```
+http://localhost:3000/nodes/conditional
+http://localhost:3000/nodes/http_request
+http://localhost:3000/nodes/search_contacts
+```
+
+---
+
+## Architecture
+
+The Web Playground is built with:
+
+- **Next.js 14** - App router, server-side rendering
+- **React 18** - UI components
+- **Tailwind CSS** - Styling
+- **react-hook-form** - Form state management
+- **@hookform/resolvers/zod** - Schema validation
+- **CryptoJS** - Credential encryption
+
+### Server-Side Execution
+
+Node execution happens on the server via `/api/execute`:
+
+```
+POST /api/execute
+{
+  "nodeType": "http_request",
+  "input": { "url": "https://api.example.com", "method": "GET" },
+  "mock": false
+}
+```
+
+This keeps credentials secure - they're never exposed to the browser.
+
+---
+
+## Customization
+
+### Adding New Nodes
+
+When you add a new node to `@jam-nodes/nodes`, it automatically appears in the playground:
+
+1. Define the node with `defineNode()` and a Zod schema
+2. Export from `@jam-nodes/nodes`
+3. Restart the dev server
+
+The form is auto-generated from the input schema.
+
+### Styling
+
+The playground uses Tailwind CSS. Modify `tailwind.config.ts` to customize:
+
+```ts
+// tailwind.config.ts
+export default {
+  theme: {
+    extend: {
+      colors: {
+        primary: '#D83A3A', // jam-nodes red
+      },
+    },
+  },
+};
+```
+
+---
+
+## Deployment
+
+The playground is not intended for production deployment - it's a development tool. If you want to host it:
+
+```bash
+npm run build
+npm run start
+```
+
+<Warning>
+Do not deploy with hardcoded credentials. The playground is designed for local development.
+</Warning>
+
+---
+
+## Troubleshooting
+
+### Form not rendering
+
+Check that the node exports a valid Zod schema:
+
+```typescript
+export const MyInputSchema = z.object({
+  field: z.string(),
+});
+
+export const myNode = defineNode({
+  // ...
+  inputSchema: MyInputSchema,
+});
+```
+
+### Execution fails silently
+
+Check the browser console and terminal for errors. Common issues:
+
+- Missing credentials in mock mode OFF
+- Invalid input data
+- Network errors
+
+### Changes not appearing
+
+The playground caches built nodes. Try:
+
+```bash
+# Rebuild nodes package
+cd packages/nodes && npm run build
+
+# Restart dev server
+cd packages/playground-web && npm run dev
+```

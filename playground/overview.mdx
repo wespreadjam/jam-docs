@@ -1,0 +1,75 @@
+---
+title: "Playground"
+description: "Test and experiment with jam-nodes without building a full application."
+---
+
+The jam-nodes Playground provides two ways to test nodes interactively:
+
+- **CLI** - A command-line tool for quick testing during development
+- **Web** - A browser-based UI for visual exploration and demos
+
+## When to Use Each
+
+| Use Case | CLI | Web |
+|----------|-----|-----|
+| Testing nodes during development | **Best** | Good |
+| Exploring node inputs/outputs | Good | **Best** |
+| CI/CD or scripted testing | **Best** | - |
+| Demos and presentations | - | **Best** |
+| Learning the node API | Good | **Best** |
+
+## Installation
+
+<CodeGroup>
+```bash npm (CLI)
+npm install -g @jam-nodes/playground
+```
+```bash npx (no install)
+npx @jam-nodes/playground list
+```
+```bash Clone repo (Web)
+git clone https://github.com/wespreadjam/jam-nodes
+cd jam-nodes/packages/playground-web
+npm install && npm run dev
+```
+</CodeGroup>
+
+## Quick Examples
+
+**List all available nodes:**
+```bash
+jam list
+```
+
+**Run a node with mock data (no API keys needed):**
+```bash
+jam run delay --mock
+```
+
+**Run a node with JSON input:**
+```bash
+jam run conditional -i '{"condition":{"type":"equals","variableName":"x","value":"y"},"trueNodeId":"a","falseNodeId":"b"}'
+```
+
+## Credential Management
+
+Both CLI and Web interfaces support three credential sources:
+
+1. **Environment variables** - Most secure, recommended for production
+2. **Encrypted local storage** - Convenient for development
+3. **Runtime prompts** - One-off testing
+
+<Tip>
+Use `jam init` to generate an `.env` template with all supported credentials.
+</Tip>
+
+## Next Steps
+
+<CardGroup cols={2}>
+  <Card title="CLI Reference" icon="terminal" href="/playground/cli">
+    Full command reference for the CLI tool.
+  </Card>
+  <Card title="Web Playground" icon="browser" href="/playground/web">
+    Guide to the browser-based playground.
+  </Card>
+</CardGroup>

@@ -32,6 +32,10 @@
           {
             "group": "AI Integration",
             "pages": ["mcp"]
+          },
+          {
+            "group": "Playground",
+            "pages": ["playground/overview", "playground/cli", "playground/web"]
           }
         ]
       }
