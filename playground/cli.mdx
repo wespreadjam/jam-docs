@@ -186,17 +186,27 @@ The CLI checks credentials in this order:
 
 ### Environment Variables
 
+The CLI loads credentials from a `.env` file in the project root or from environment variables:
+
 | Service | Variable |
 |---------|----------|
-| Apollo.io | `JAM_APOLLO_API_KEY` |
-| Hunter.io | `JAM_HUNTER_API_KEY` |
-| OpenAI | `JAM_OPENAI_API_KEY` |
-| Anthropic | `JAM_ANTHROPIC_API_KEY` |
-| Twitter | `JAM_TWITTER_BEARER_TOKEN` |
-| Reddit | `JAM_REDDIT_CLIENT_ID`, `JAM_REDDIT_CLIENT_SECRET` |
-| LinkedIn | `JAM_LINKEDIN_ACCESS_TOKEN` |
-| DataForSEO | `JAM_DATAFORSEO_LOGIN`, `JAM_DATAFORSEO_PASSWORD` |
-| SendGrid | `JAM_SENDGRID_API_KEY` |
+| Apollo.io | `APOLLO_API_KEY` |
+| OpenAI | `OPENAI_API_KEY` |
+| Anthropic | `ANTHROPIC_API_KEY` |
+| Twitter (TwitterAPI.io) | `TWITTERAPI_IO_KEY` |
+| LinkedIn (ForumScout) | `FORUMSCOUT_API_KEY` |
+| DataForSEO | `DATAFORSEO_API_TOKEN` (Base64 encoded login:password) |
+
+**Example `.env` file:**
+
+```bash
+APOLLO_API_KEY=your-apollo-key
+ANTHROPIC_API_KEY=sk-ant-...
+TWITTERAPI_IO_KEY=your-twitter-key
+FORUMSCOUT_API_KEY=your-forumscout-key
+DATAFORSEO_API_TOKEN=base64-encoded-credentials
+OPENAI_API_KEY=sk-...
+```
 
 <Tip>
 Use `jam init` to generate a template with all variables.
