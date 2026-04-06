@@ -95,11 +95,11 @@
       "anchors": [
         {
           "anchor": "Website",
-          "href": "https://spreadjam.com"
+          "href": "https://www.spreadjam.com"
         },
         {
           "anchor": "Blog",
-          "href": "https://spreadjam.com/blogs"
+          "href": "https://www.spreadjam.com/blogs"
         },
         {
           "anchor": "Open Source",
@@ -121,17 +121,17 @@
     "links": [
       {
         "label": "Blog",
-        "href": "https://spreadjam.com/blogs"
+        "href": "https://www.spreadjam.com/blogs"
       },
       {
         "label": "Pricing",
-        "href": "https://spreadjam.com/pricing"
+        "href": "https://www.spreadjam.com/pricing"
       }
     ],
     "primary": {
       "type": "button",
       "label": "Get started",
-      "href": "https://spreadjam.com"
+      "href": "https://www.spreadjam.com"
     }
   },
   "contextual": {
