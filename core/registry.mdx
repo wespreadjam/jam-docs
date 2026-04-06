@@ -1,0 +1,145 @@
+---
+title: "NodeRegistry"
+description: "Manage node definitions -- register, query, validate, and execute nodes."
+---
+
+## Overview
+
+`NodeRegistry` manages all node definitions. It's generic over node type strings for type-safe lookups.
+
+```typescript
+import { NodeRegistry } from '@jam-nodes/core';
+
+const registry = new NodeRegistry();
+```
+
+You can optionally constrain type strings:
+
+```typescript
+const registry = new NodeRegistry<'conditional' | 'end' | 'custom'>();
+```
+
+## Methods
+
+### register
+
+Register a single node definition. Throws if the type is already registered.
+
+```typescript
+register<TInput, TOutput>(definition: NodeDefinition<TInput, TOutput>): this
+```
+
+### registerAll
+
+Register multiple nodes at once.
+
+```typescript
+registerAll(definitions: NodeDefinition[]): this
+```
+
+```typescript
+import { builtInNodes } from '@jam-nodes/nodes';
+registry.registerAll(builtInNodes);
+```
+
+### unregister
+
+Remove a registered node type. Returns `true` if it existed.
+
+```typescript
+unregister(type: string): boolean
+```
+
+### has
+
+Check if a type is registered.
+
+```typescript
+has(type: string): boolean
+```
+
+### getDefinition
+
+Get the full definition including executor.
+
+```typescript
+getDefinition(type: string): NodeDefinition | undefined
+```
+
+### getMetadata
+
+Get client-safe metadata (no executor). Safe to send to the browser.
+
+```typescript
+getMetadata(type: string): NodeMetadata | undefined
+```
+
+### getExecutor
+
+Get just the executor function.
+
+```typescript
+getExecutor(type: string): NodeExecutor | undefined
+```
+
+### getNodeTypes
+
+Get all registered type identifiers.
+
+```typescript
+getNodeTypes(): string[]
+```
+
+### getAllDefinitions / getAllMetadata
+
+```typescript
+getAllDefinitions(): NodeDefinition[]
+getAllMetadata(): NodeMetadata[]
+```
+
+### getByCategory / getMetadataByCategory
+
+Filter definitions or metadata by category.
+
+```typescript
+getByCategory(category: NodeCategory): NodeDefinition[]
+getMetadataByCategory(category: NodeCategory): NodeMetadata[]
+```
+
+### validateInput / validateOutput
+
+Validate data against a node's Zod schema. Throws `ZodError` on failure.
+
+```typescript
+validateInput<TInput>(type: string, input: unknown): TInput
+validateOutput<TOutput>(type: string, output: unknown): TOutput
+```
+
+### size
+
+```typescript
+get size(): number
+```
+
+## Example
+
+```typescript
+const registry = new NodeRegistry();
+registry.registerAll(builtInNodes);
+
+const def = registry.getDefinition('conditional');
+const executor = registry.getExecutor('filter');
+const logicNodes = registry.getByCategory('logic');
+const validated = registry.validateInput('delay', { durationMs: 5000 });
+
+console.log(registry.size); // 16
+```
+
+## Factory Function
+
+`createRegistry<TNodeType>()` creates a new empty `NodeRegistry`.
+
+```typescript
+import { createRegistry } from '@jam-nodes/core';
+const registry = createRegistry();
+```

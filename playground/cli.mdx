@@ -1,0 +1,117 @@
+---
+title: "CLI Reference"
+description: "Full command reference for the jam-nodes CLI playground."
+---
+
+## Installation
+
+**Global install:**
+
+```bash
+npm install -g @jam-nodes/playground
+```
+
+**No install (npx):**
+
+```bash
+npx @jam-nodes/playground <command>
+```
+
+**From source:**
+
+```bash
+git clone https://github.com/wespreadjam/jam-nodes
+cd jam-nodes/packages/playground
+npm install && npm link
+```
+
+## Commands
+
+### `jam list`
+
+List all available nodes.
+
+```bash
+jam list
+jam list --category integration
+jam list --json
+```
+
+| Flag | Description |
+| --- | --- |
+| `--category <cat>` | Filter by category: `logic`, `transform`, `integration`, `action` |
+| `--json` | Output as JSON |
+
+### `jam run <node>`
+
+Run a node interactively.
+
+```bash
+jam run delay
+jam run delay --mock
+jam run conditional -i '{"condition":{"type":"equals","variableName":"x","value":"y"},"trueNodeId":"a","falseNodeId":"b"}'
+```
+
+| Flag | Description |
+| --- | --- |
+| `-i, --input <json>` | JSON input (skips interactive prompts) |
+| `--mock` | Use mock data (no API keys needed) |
+| `-y, --yes` | Skip confirmation prompts |
+
+When `--input` is not provided, the CLI prompts for each required field interactively.
+
+### `jam init`
+
+Generate an `.env` template with all supported credential placeholders.
+
+```bash
+jam init
+```
+
+Creates a `.env` file with entries for:
+
+```bash
+JAM_APOLLO_API_KEY=
+JAM_HUNTER_API_KEY=
+JAM_TWITTER_BEARER_TOKEN=
+JAM_OPENAI_API_KEY=
+JAM_ANTHROPIC_API_KEY=
+JAM_FORUMSCOUT_API_KEY=
+JAM_DATAFORSEO_LOGIN=
+JAM_DATAFORSEO_PASSWORD=
+```
+
+### `jam credentials`
+
+Manage saved credentials.
+
+| Subcommand | Description |
+| --- | --- |
+| `jam credentials list` | Show all saved credentials |
+| `jam credentials set <service> <key>` | Save a credential |
+| `jam credentials check <service>` | Check if a credential exists |
+| `jam credentials delete <service>` | Remove a credential |
+
+## Credential Priority
+
+The CLI checks credentials in this order:
+
+1. **Environment variables** - `JAM_<SERVICE>_API_KEY` format
+2. **Encrypted local storage** - saved via `jam credentials set`
+3. **Runtime prompts** - asked during `jam run`
+
+## Scripting
+
+The CLI supports JSON output for scripting with tools like `jq`:
+
+```bash
+jam list --json | jq '.[].type'
+jam run map --mock -y --json | jq '.results'
+```
+
+**Exit codes:**
+
+| Code | Meaning |
+| --- | --- |
+| `0` | Success |
+| `1` | Error (invalid input, missing credentials, execution failure) |

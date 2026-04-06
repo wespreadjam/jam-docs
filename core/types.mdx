@@ -1,0 +1,147 @@
+---
+title: "Types"
+description: "Core type definitions for jam-nodes."
+---
+
+## NodeCategory
+
+```typescript
+type NodeCategory = 'action' | 'logic' | 'integration' | 'transform';
+```
+
+## NodeCapabilities
+
+```typescript
+interface NodeCapabilities {
+  supportsEnrichment?: boolean;
+  supportsBulkActions?: boolean;
+  supportsApproval?: boolean;
+  supportsRerun?: boolean;
+  supportsCancel?: boolean;
+}
+```
+
+## NodeMetadata
+
+Client-safe metadata (no executor). Used for UI rendering.
+
+- **type** (string, required): Unique node type identifier.
+- **name** (string, required): Human-readable display name.
+- **description** (string, required): Description shown in the editor palette.
+- **category** (NodeCategory, required): One of `action`, `logic`, `integration`, `transform`.
+- **estimatedDuration** (number): Estimated execution time in seconds.
+- **capabilities** (NodeCapabilities): Feature flags for the node.
+
+## NodeDefinition\<TInput, TOutput\>
+
+Complete node definition. Extends `NodeMetadata` with schemas and executor.
+
+- **inputSchema** (z.ZodSchema\<TInput\>, required): Zod schema for validating node inputs.
+- **outputSchema** (z.ZodSchema\<TOutput\>, required): Zod schema for validating node outputs.
+- **executor** (NodeExecutor\<TInput, TOutput\>, required): Async function that executes the node logic.
+
+## NodeExecutionContext
+
+Passed to every node executor.
+
+- **userId** (string, required): The user running the workflow.
+- **campaignId** (string): Optional project/campaign context.
+- **workflowExecutionId** (string, required): Unique identifier for this workflow run.
+- **variables** (Record\<string, unknown\>, required): All workflow variables (includes upstream node outputs).
+- **resolveNestedPath** ((path: string) => unknown, required): Resolve dot-notation paths like `contact.email` against variables.
+- **services** (NodeServices): Injected service implementations.
+
+## NodeExecutionResult\<TOutput\>
+
+Returned by every node executor.
+
+- **success** (boolean, required): Whether execution succeeded.
+- **output** (TOutput): The node's output data (must match `outputSchema`).
+- **error** (string): Error message if `success` is `false`.
+- **nextNodeId** (string): For conditional branching, which node to execute next.
+- **needsApproval** (NodeApprovalRequest): Request human approval before continuing.
+- **notification** (object): Emit a notification with `title`, `message`, and optional `data`.
+
+## NodeExecutor\<TInput, TOutput\>
+
+```typescript
+type NodeExecutor<TInput = unknown, TOutput = unknown> = (
+  input: TInput,
+  context: NodeExecutionContext
+) => Promise<NodeExecutionResult<TOutput>>;
+```
+
+## NodeApprovalRequest
+
+```typescript
+interface NodeApprovalRequest {
+  resourceIds: string[];
+  resourceType: string;
+  message?: string;
+  detailComponent?: string;
+}
+```
+
+## BaseNodeConfig / Approval / Notifications
+
+Optional config any node can include:
+
+```typescript
+interface BaseNodeConfig {
+  approval?: NodeApprovalConfig;
+  notification?: NodeNotificationConfig;
+}
+
+interface NodeApprovalConfig {
+  required: boolean;
+  pauseWorkflow?: boolean;       // default: true
+  timeoutMinutes?: number;       // default: 1440 (24h)
+  approvalType?: string;
+  message?: string;
+}
+
+interface NodeNotificationConfig {
+  enabled: boolean;
+  channels?: Array<'chat' | 'email' | 'slack' | 'webhook'>;
+  message?: string;
+  priority?: 'low' | 'medium' | 'high';
+  notifyOnComplete?: boolean;
+  notifyOnError?: boolean;
+}
+```
+
+## NodeServices
+
+All optional. Host applications inject implementations via `context.services`.
+
+```typescript
+interface NodeServices {
+  apollo?: ApolloClient;
+  dataForSeo?: DataForSeoClient;
+  twitter?: TwitterClient;
+  forumScout?: ForumScoutClient;
+  openai?: OpenAIClient;
+  anthropic?: AnthropicClient;
+  notifications?: NotificationService;
+  storage?: StorageService;
+  cache?: CacheService;
+  emailDrafts?: EmailDraftsService;
+  analyzedPosts?: AnalyzedPostsStorage;
+}
+```
+
+### Service Interfaces
+
+| Service                | Key Methods                                                                 |
+| ---------------------- | --------------------------------------------------------------------------- |
+| `ApolloClient`         | `searchContacts(params)`, `enrichContact(contactId)`                        |
+| `DataForSeoClient`     | `getOnPageInstant(url, options?)`, `getRelatedKeywords(keywords, options?)` |
+| `TwitterClient`        | `searchTweets(query, options?)`                                             |
+| `ForumScoutClient`     | `searchLinkedIn(keywords, options?)`                                        |
+| `OpenAIClient`         | `generateVideo(params)`, `generateImage(params)`                            |
+| `AnthropicClient`      | `generateText(params)`, `generateStructured<T>(params)`                     |
+| `NotificationService`  | `send(params)`                                                              |
+| `EmailDraftsService`   | `createDraft(params)`                                                       |
+| `AnalyzedPostsStorage` | `storePosts(params)`                                                        |
+| `StorageService`       | `save<T>(key, data)`, `get<T>(key)`, `delete(key)`                          |
+| `CacheService`         | `get<T>(key)`, `set<T>(key, value, ttlSeconds?)`, `delete(key)`             |

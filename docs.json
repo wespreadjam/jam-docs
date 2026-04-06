@@ -1,71 +1,90 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mint Starter Kit",
+  "name": "Jam",
   "colors": {
-    "primary": "#D83A3A",
-    "light": "#F10606",
-    "dark": "#9C0041"
+    "primary": "#171717",
+    "light": "#fafafa",
+    "dark": "#171717"
+  },
+  "styling": {
+    "codeblocks": {
+      "themes": {
+        "light": "github-light",
+        "dark": "github-dark-dimmed"
+      }
+    }
+  },
+  "background": {
+    "color": {
+      "light": "#FAF9F5",
+      "dark": "#1c1c1c"
+    }
   },
   "metadata": {
-    "og:image": "/images/og-image.png"
+    "og:image": "/images/og-image.png",
+    "og:site_name": "Jam Docs",
+    "og:description": "Documentation for Jam, the AI growth agent for builders"
   },
   "favicon": "/favicon.svg",
+  "fonts": {
+    "family": "Inter",
+    "heading": {
+      "family": "Inter",
+      "weight": 300
+    },
+    "body": {
+      "family": "Inter",
+      "weight": 400
+    }
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "rounded": "default",
   "navigation": {
     "tabs": [
       {
-        "tab": "Guides",
+        "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting started",
+            "group": "Getting Started",
             "pages": [
               "index",
-              "quickstart",
-              "development"
+              "quickstart"
             ]
           },
           {
-            "group": "Customization",
+            "group": "Core",
             "pages": [
-              "essentials/settings",
-              "essentials/navigation"
+              "core/types",
+              "core/registry",
+              "core/execution-context",
+              "core/utilities"
             ]
           },
           {
-            "group": "Writing content",
+            "group": "Built-in Nodes",
             "pages": [
-              "essentials/markdown",
-              "essentials/code",
-              "essentials/images",
-              "essentials/reusable-snippets"
+              "nodes/overview",
+              "nodes/logic",
+              "nodes/transform",
+              "nodes/integration",
+              "nodes/ai"
             ]
           },
           {
-            "group": "AI tools",
+            "group": "Playground",
             "pages": [
-              "ai-tools/cursor",
-              "ai-tools/claude-code",
-              "ai-tools/windsurf"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API reference",
-        "groups": [
-          {
-            "group": "API documentation",
-            "pages": [
-              "api-reference/introduction"
+              "playground/overview",
+              "playground/cli",
+              "playground/web"
             ]
           },
           {
-            "group": "Endpoint examples",
+            "group": "Guides",
             "pages": [
-              "api-reference/endpoint/get",
-              "api-reference/endpoint/create",
-              "api-reference/endpoint/delete",
-              "api-reference/endpoint/webhook"
+              "creating-nodes"
             ]
           }
         ]
@@ -74,32 +93,44 @@
     "global": {
       "anchors": [
         {
-          "anchor": "Documentation",
-          "href": "https://mintlify.com/docs"
+          "anchor": "Website",
+          "href": "https://spreadjam.com"
         },
         {
           "anchor": "Blog",
-          "href": "https://mintlify.com/blog"
+          "href": "https://spreadjam.com/blogs"
+        },
+        {
+          "anchor": "Open Source",
+          "href": "https://github.com/wespreadjam/jam-nodes"
+        },
+        {
+          "anchor": "Discord",
+          "href": "https://dsc.gg/spreadjam"
         }
       ]
     }
   },
   "logo": {
-    "light": "/logo/light.png",
-    "dark": "/logo/dark.png",
-    "height": 40
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "height": 28
   },
   "navbar": {
     "links": [
       {
-        "label": "Support",
-        "href": "mailto:hi@mintlify.com"
+        "label": "Blog",
+        "href": "https://spreadjam.com/blogs"
+      },
+      {
+        "label": "Pricing",
+        "href": "https://spreadjam.com/pricing"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Dashboard",
-      "href": "https://dashboard.mintlify.com"
+      "label": "Get started",
+      "href": "https://spreadjam.com/landing"
     }
   },
   "contextual": {
@@ -116,9 +147,10 @@
   },
   "footer": {
     "socials": {
-      "x": "https://x.com/mintlify",
-      "github": "https://github.com/mintlify",
-      "linkedin": "https://linkedin.com/company/mintlify"
+      "x": "https://x.com/wespreadjam",
+      "github": "https://github.com/wespreadjam",
+      "linkedin": "https://www.linkedin.com/company/108739060/",
+      "discord": "https://dsc.gg/spreadjam"
     }
   }
 }

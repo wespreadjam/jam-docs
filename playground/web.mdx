@@ -1,0 +1,69 @@
+---
+title: "Web Playground"
+description: "Browser-based UI for visual exploration and testing of jam-nodes."
+---
+
+## Overview
+
+The Web Playground provides a browser-based interface for testing jam-nodes. Forms are auto-generated from Zod schemas, so new nodes are available immediately without any manual UI work.
+
+## Setup
+
+```bash
+git clone https://github.com/wespreadjam/jam-nodes
+cd jam-nodes/packages/playground-web
+npm install
+npm run dev
+```
+
+Open `http://localhost:3000` in your browser.
+
+The Web Playground is for development only. Do not deploy with hardcoded credentials.
+
+## Features
+
+### Node Browser
+
+The sidebar organizes nodes by category:
+
+- **Logic** - Conditional, Delay, End
+- **Transform** - Map, Filter
+- **Integration** - HTTP Request, Reddit Monitor, Twitter Monitor, LinkedIn Monitor, Search Contacts, Draft Emails
+- **Action** - Social AI Analyze, Sora Video, SEO Keyword Research, SEO Audit, Social Keyword Generator
+
+### Auto-Generated Forms
+
+Input forms render based on each node's Zod schema definition. Required fields are marked with asterisks, and real-time validation runs automatically as you type.
+
+### Mock Mode
+
+Toggle between:
+
+- **Mock mode** - Returns schema-valid sample data without API calls
+- **Live mode** - Executes actual API calls using your credentials
+
+### Credential Management
+
+Store API keys in the browser for quick testing.
+
+Browser-stored credentials are encrypted but less secure than environment variables. Use environment variables for sensitive keys.
+
+### Results Viewer
+
+After execution, see:
+
+- **Output** - Full JSON output from the node
+- **Duration** - Execution time
+- **Errors** - Any validation or runtime errors with details
+
+## Tech Stack
+
+| Technology | Purpose |
+| --- | --- |
+| Next.js 14 | App framework |
+| React 18 | UI components |
+| Tailwind CSS | Styling |
+| react-hook-form | Form state management |
+| CryptoJS | Credential encryption |
+
+Node execution happens server-side via the `/api/execute` endpoint to prevent credential exposure in the browser.

@@ -1,0 +1,267 @@
+---
+title: "Integration Nodes"
+description: "External API integrations: HTTP requests, social monitoring, contacts, and email drafting."
+---
+
+## http_request
+
+Make HTTP requests to external APIs.
+
+- **Category:** `integration`
+- **Estimated Duration:** 5s
+- **Capabilities:** `supportsRerun`, `supportsCancel`
+- **Services:** None (uses native `fetch`)
+
+### Input
+
+<ParamField body="url" type="string (URL)" required>
+  URL to request.
+</ParamField>
+
+<ParamField body="method" type="enum" default="GET">
+  `'GET'` | `'POST'` | `'PUT'` | `'PATCH'` | `'DELETE'`
+</ParamField>
+
+<ParamField body="headers" type="Record<string, string>">
+  Request headers.
+</ParamField>
+
+<ParamField body="body" type="unknown">
+  Request body (JSON-serialized for POST/PUT/PATCH).
+</ParamField>
+
+<ParamField body="timeout" type="number" default="30000">
+  Timeout in ms (1000-60000).
+</ParamField>
+
+### Output
+
+| Field        | Type                     | Description                    |
+| ------------ | ------------------------ | ------------------------------ |
+| `status`     | `number`                 | HTTP status code               |
+| `statusText` | `string`                 | Status text                    |
+| `headers`    | `Record<string, string>` | Response headers               |
+| `body`       | `unknown`                | Parsed response (JSON or text) |
+| `ok`         | `boolean`                | Whether status is 2xx          |
+| `durationMs` | `number`                 | Request duration               |
+
+---
+
+## reddit_monitor
+
+Search Reddit for posts matching keywords. Uses public Reddit `search.json` API, no authentication required.
+
+- **Category:** `integration`
+- **Estimated Duration:** 20s
+- **Capabilities:** `supportsRerun`
+- **Services:** Optional `notifications`
+
+### Input
+
+<ParamField body="keywords" type="string[]" required>
+  Keywords to search for.
+</ParamField>
+
+<ParamField body="timeFilter" type="enum" default="day">
+  `'hour'` | `'day'` | `'week'` | `'month'` | `'year'` | `'all'`
+</ParamField>
+
+<ParamField body="sortBy" type="enum" default="new">
+  `'relevance'` | `'hot'` | `'top'` | `'new'` | `'comments'`
+</ParamField>
+
+<ParamField body="maxResults" type="number" default="50">
+  Max results (capped at 100).
+</ParamField>
+
+### Output
+
+| Field                | Type           | Description       |
+| -------------------- | -------------- | ----------------- |
+| `posts`              | `RedditPost[]` | Posts found       |
+| `totalFound`         | `number`       | Number of posts   |
+| `subredditsSearched` | `string[]`     | Always `['all']`  |
+
+---
+
+## twitter_monitor
+
+Search Twitter/X for posts matching keywords.
+
+- **Category:** `integration`
+- **Estimated Duration:** 15s
+- **Capabilities:** `supportsRerun`
+- **Services:** **Required:** `twitter`. Optional `notifications`
+
+### Input
+
+<ParamField body="keywords" type="string[]" required>
+  Keywords to search.
+</ParamField>
+
+<ParamField body="excludeRetweets" type="boolean" default="true">
+  Exclude retweets.
+</ParamField>
+
+<ParamField body="minLikes" type="number">
+  Minimum likes filter.
+</ParamField>
+
+<ParamField body="maxResults" type="number" default="50">
+  Max results.
+</ParamField>
+
+<ParamField body="lang" type="string">
+  Language filter (e.g. `'en'`).
+</ParamField>
+
+<ParamField body="sinceDays" type="number">
+  Search tweets from last N days.
+</ParamField>
+
+### Output
+
+| Field        | Type            | Description        |
+| ------------ | --------------- | ------------------ |
+| `posts`      | `TwitterPost[]` | Posts found        |
+| `totalFound` | `number`        | Count              |
+| `hasMore`    | `boolean`       | Always `false`     |
+| `cursor`     | `string?`       | Pagination cursor  |
+
+---
+
+## linkedin_monitor
+
+Search LinkedIn for posts via ForumScout API.
+
+- **Category:** `integration`
+- **Estimated Duration:** 60s
+- **Capabilities:** `supportsRerun`
+- **Services:** **Required:** `forumScout`. Optional `notifications`
+
+### Input
+
+<ParamField body="keywords" type="string[]" required>
+  Keywords to search.
+</ParamField>
+
+<ParamField body="timeFilter" type="string">
+  Time filter.
+</ParamField>
+
+<ParamField body="maxResults" type="number" default="50">
+  Max results.
+</ParamField>
+
+### Output
+
+| Field        | Type             | Description |
+| ------------ | ---------------- | ----------- |
+| `posts`      | `LinkedInPost[]` | Posts found |
+| `totalFound` | `number`         | Count       |
+
+---
+
+## search_contacts
+
+Search for contacts using Apollo.io with email enrichment.
+
+- **Category:** `integration`
+- **Estimated Duration:** 5s
+- **Capabilities:** `supportsEnrichment`, `supportsBulkActions`, `supportsRerun`
+- **Services:** **Required:** `apollo`
+
+### Input
+
+<ParamField body="personTitles" type="string[]">
+  Job titles to search.
+</ParamField>
+
+<ParamField body="personLocations" type="string[]">
+  Person locations.
+</ParamField>
+
+<ParamField body="organizationLocations" type="string[]">
+  Organization locations.
+</ParamField>
+
+<ParamField body="employeeRanges" type="string[]">
+  Employee count ranges (e.g. `"1-10"`).
+</ParamField>
+
+<ParamField body="keywords" type="string">
+  Search keywords.
+</ParamField>
+
+<ParamField body="limit" type="number" default="10">
+  Max contacts (capped at 100).
+</ParamField>
+
+<ParamField body="includeSimilarTitles" type="boolean">
+  Include similar titles.
+</ParamField>
+
+<ParamField body="personSeniorities" type="string[]">
+  e.g. `"vp"`, `"director"`
+</ParamField>
+
+<ParamField body="technologies" type="string[]">
+  Technologies used.
+</ParamField>
+
+<ParamField body="industryTagIds" type="string[]">
+  Industry tags.
+</ParamField>
+
+<ParamField body="departments" type="string[]">
+  e.g. `"engineering"`, `"sales"`
+</ParamField>
+
+### Output
+
+| Field        | Type     | Description          |
+| ------------ | -------- | -------------------- |
+| `contacts`   | `array`  | Contact objects       |
+| `totalFound` | `number` | Total contacts found |
+
+---
+
+## draft_emails
+
+Generate personalized email drafts for contacts using Claude.
+
+- **Category:** `action`
+- **Estimated Duration:** 30s
+- **Capabilities:** `supportsRerun`, `supportsBulkActions`
+- **Services:** **Required:** `anthropic`, `emailDrafts`
+
+`campaignId` must be set in the execution context, and `variables.senderName` must exist.
+
+### Input
+
+<ParamField body="contacts" type="Contact[]" required>
+  Array of contacts with id, name, email, title, and company.
+</ParamField>
+
+<ParamField body="productDescription" type="string" required>
+  Product/service description.
+</ParamField>
+
+<ParamField body="emailTemplate" type="string">
+  Optional email template.
+</ParamField>
+
+<ParamField body="subject" type="string">
+  Optional subject line.
+</ParamField>
+
+<ParamField body="approval" type="object">
+  `{ required: boolean, message?: string }`
+</ParamField>
+
+### Output
+
+| Field          | Type               | Description              |
+| -------------- | ------------------ | ------------------------ |
+| `emails`       | `DraftEmailInfo[]` | Generated email drafts   |
+| `draftedCount` | `number`           | Number of emails drafted |

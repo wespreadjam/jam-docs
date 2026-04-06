@@ -1,0 +1,201 @@
+---
+title: "Creating Custom Nodes"
+description: "Build your own jam-nodes with Zod schemas, executors, and registry integration."
+---
+
+Creating a custom node involves three steps: defining Zod schemas for inputs and outputs, implementing an executor function, and registering the node with the registry.
+
+## 1. Define Schemas
+
+Use Zod to define your input and output schemas:
+
+```typescript
+import { z } from 'zod';
+
+const inputSchema = z.object({
+  url: z.string().url().describe('URL to fetch'),
+  timeout: z.number().default(5000).describe('Timeout in ms'),
+  format: z.enum(['json', 'text']).default('json'),
+  headers: z.record(z.string()).optional(),
+});
+
+const outputSchema = z.object({
+  data: z.unknown(),
+  status: z.number(),
+  durationMs: z.number(),
+});
+```
+
+**Schema tips:**
+
+- Use `.optional()` for non-required fields
+- Use `.default(value)` for defaults
+- Use `z.enum([...])` for dropdown selections
+- Use `.describe('...')` for field descriptions (shown in playground)
+- Nest `z.object()` for collapsible sections in the UI
+
+## 2. Create the Node
+
+Use `defineNode` to create a fully typed node:
+
+```typescript
+import { defineNode } from '@jam-nodes/core';
+
+export const myNode = defineNode({
+  type: 'my_custom_node',
+  name: 'My Custom Node',
+  description: 'Does something useful.',
+  category: 'integration',
+  inputSchema,
+  outputSchema,
+  estimatedDuration: 5,
+  capabilities: {
+    supportsRerun: true,
+    supportsCancel: false,
+  },
+  executor: async (input, context) => {
+    try {
+      const response = await fetch(input.url, {
+        signal: AbortSignal.timeout(input.timeout),
+        headers: input.headers,
+      });
+
+      const data = input.format === 'json'
+        ? await response.json()
+        : await response.text();
+
+      return {
+        success: true,
+        data: {
+          data,
+          status: response.status,
+          durationMs: Date.now() - context.startTime,
+        },
+      };
+    } catch (error) {
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Unknown error',
+      };
+    }
+  },
+});
+```
+
+## 3. Choose a Category
+
+| Category | Purpose | Examples |
+| --- | --- | --- |
+| `action` | AI generation, content creation | social_ai_analyze, draft_emails |
+| `logic` | Conditionals, flow control | conditional, delay, end |
+| `integration` | External APIs | http_request, twitter_monitor |
+| `transform` | Data manipulation | map, filter |
+
+## 4. Use Credentials
+
+Access credentials via `context.credentials`:
+
+```typescript
+executor: async (input, context) => {
+  const apiKey = context.credentials?.myService;
+  if (!apiKey) {
+    return { success: false, error: 'Missing myService credentials' };
+  }
+
+  const response = await fetch('https://api.example.com/data', {
+    headers: { Authorization: `Bearer ${apiKey}` },
+  });
+
+  // ...
+}
+```
+
+Available credential services: `apollo`, `twitter`, `forumScout`, `dataForSeo`, `openai`, `anthropic`.
+
+## 5. Use ExecutionContext
+
+The context object provides access to workflow state:
+
+```typescript
+executor: async (input, context) => {
+  // Access user and workflow info
+  const userId = context.userId;
+  const campaignId = context.campaignId;
+
+  // Access upstream node outputs
+  const previousOutput = context.getNodeOutput('previous-node-id');
+
+  // Access workflow variables
+  const siteUrl = context.variables?.site_url;
+
+  // Conditional branching
+  if (someCondition) {
+    return {
+      success: true,
+      data: { result: 'branching' },
+      nextNodeId: 'node-a',
+    };
+  }
+
+  // Request approval before continuing
+  return {
+    success: true,
+    data: { drafts: [...] },
+    approval: { required: true, message: 'Review drafts before sending' },
+  };
+}
+```
+
+## 6. Register the Node
+
+```typescript
+import { NodeRegistry } from '@jam-nodes/core';
+import { builtInNodes } from '@jam-nodes/nodes';
+import { myNode } from './my-custom-node';
+
+const registry = new NodeRegistry();
+
+// Register built-in nodes
+builtInNodes.forEach((node) => registry.register(node));
+
+// Register custom node
+registry.register(myNode);
+```
+
+## 7. Test the Node
+
+```typescript
+import { createExecutionContext } from '@jam-nodes/core';
+
+// Create a test context
+const context = createExecutionContext({
+  userId: 'test-user',
+  variables: { site_url: 'https://example.com' },
+});
+
+// Validate input against schema
+const parsed = myNode.inputSchema.safeParse({
+  url: 'https://api.example.com',
+});
+
+if (parsed.success) {
+  const result = await myNode.executor(parsed.data, context);
+  console.log(result);
+}
+```
+
+## File Organization
+
+Organize nodes by category:
+
+```
+src/nodes/
+  integration/
+    my-custom-node.ts
+    another-node.ts
+  action/
+    ai-node/
+      index.ts       # Node definition
+      schema.ts      # Zod schemas
+      prompt.ts      # AI prompt templates
+```

@@ -1,12 +1,12 @@
-<svg width="320" height="70" viewBox="0 0 320 70" fill="none" xmlns="http://www.w3.org/2000/svg">
-  <!-- Jam outline logo (thick) scaled down -->
-  <g transform="translate(0, 5) scale(0.22)">
-    <path d="M2.5 190.813C2.5 170.553 18.9241 154.129 39.1842 154.129H100.326V227.497H39.1843C18.9241 227.497 2.5 211.073 2.5 190.813V190.813Z" stroke="#F10606" stroke-width="10"/>
-    <path d="M198.154 190.812C198.154 211.072 181.73 227.496 161.47 227.496L100.328 227.496L100.328 154.128L161.47 154.128C181.73 154.128 198.154 170.552 198.154 190.812V190.812Z" stroke="#F10606" stroke-width="10"/>
-    <path d="M198.154 114.998C198.154 136.609 180.635 154.128 159.025 154.128L100.328 154.128L100.328 75.8682L159.025 75.8682C180.635 75.8682 198.154 93.3872 198.154 114.998V114.998Z" stroke="#F10606" stroke-width="10"/>
-    <rect x="198.154" y="75.8682" width="195.652" height="73.3685" rx="36.6842" transform="rotate(-180 198.154 75.8682)" stroke="#F10606" stroke-width="10"/>
-    <rect x="100.327" y="154.128" width="97.826" height="78.2597" rx="39.1299" transform="rotate(-180 100.327 154.128)" stroke="#F10606" stroke-width="10"/>
+<svg width="90" height="28" viewBox="0 0 90 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Jam filled logo icon, scaled to 24x28 to match jam website navbar -->
+  <g transform="scale(0.1291)">
+    <path d="M0 181.623C0 162.083 15.8404 146.242 35.3804 146.242H94.3478V217.003H35.3804C15.8403 217.003 0 201.163 0 181.623V181.623Z" fill="#D83A3A"/>
+    <path d="M188.698 181.621C188.698 201.161 172.858 217.001 153.317 217.001L94.35 217.001L94.3501 146.241L153.317 146.241C172.858 146.241 188.698 162.081 188.698 181.621V181.621Z" fill="#F10606"/>
+    <path d="M188.698 108.503C188.698 129.346 171.801 146.242 150.959 146.242L94.35 146.242L94.3501 70.7639L150.959 70.764C171.802 70.764 188.698 87.6603 188.698 108.503V108.503Z" fill="#9C0041"/>
+    <rect x="188.698" y="70.7612" width="188.696" height="70.7608" rx="35.3804" transform="rotate(-180 188.698 70.7612)" fill="#710544"/>
+    <rect x="94.3489" y="146.242" width="94.3478" height="75.4782" rx="37.7391" transform="rotate(-180 94.3489 146.242)" fill="#BA0849"/>
   </g>
-  <!-- "Jam" text in Inter font style -->
-  <text x="58" y="62" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="65" font-weight="500" fill="#fafafa">Jam</text>
+  <!-- "Jam" text: text-3xl (30px) font-semibold (600), 8px gap from icon -->
+  <text x="33" y="22" font-family="Inter, system-ui, -apple-system, sans-serif" font-size="24" font-weight="600" fill="#fafafa">Jam</text>
 </svg>

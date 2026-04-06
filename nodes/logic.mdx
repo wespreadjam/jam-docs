@@ -1,0 +1,100 @@
+---
+title: "Logic Nodes"
+description: "Flow control nodes: conditional branching, delays, and end markers."
+---
+
+## conditional
+
+Branch workflow based on a condition. Returns the appropriate `nextNodeId`.
+
+- **Category:** `logic`
+- **Estimated Duration:** 0s
+- **Capabilities:** `supportsRerun`
+
+### Input
+
+<ParamField body="condition" type="object" required>
+  Condition to evaluate.
+</ParamField>
+
+- `condition.type`: `'equals'` | `'not_equals'` | `'greater_than'` | `'less_than'` | `'contains'` | `'exists'`
+- `condition.variableName`: Variable path using dot notation
+- `condition.value`: Comparison value
+
+<ParamField body="trueNodeId" type="string" required>
+  Node to execute when condition is true.
+</ParamField>
+
+<ParamField body="falseNodeId" type="string" required>
+  Node to execute when condition is false.
+</ParamField>
+
+### Output
+
+| Field            | Type      | Description              |
+| ---------------- | --------- | ------------------------ |
+| `conditionMet`   | `boolean` | Result of the evaluation |
+| `selectedBranch` | `string`  | `'true'` or `'false'`   |
+
+### Example
+
+```typescript
+{
+  condition: {
+    type: 'greater_than',
+    variableName: 'contacts.length',
+    value: 0,
+  },
+  trueNodeId: 'send-emails',
+  falseNodeId: 'no-contacts',
+}
+```
+
+---
+
+## end
+
+Mark the end of a workflow branch with an optional message.
+
+- **Category:** `logic`
+- **Estimated Duration:** 0s
+
+### Input
+
+<ParamField body="message" type="string">
+  Optional completion message.
+</ParamField>
+
+### Output
+
+| Field       | Type      | Description            |
+| ----------- | --------- | ---------------------- |
+| `completed` | `boolean` | Always `true`          |
+| `message`   | `string`  | Echoed input message   |
+
+---
+
+## delay
+
+Pause workflow execution for a specified duration.
+
+- **Category:** `logic`
+- **Capabilities:** `supportsCancel`
+
+### Input
+
+<ParamField body="durationMs" type="number" required>
+  Duration in milliseconds (0-3,600,000, max 1 hour).
+</ParamField>
+
+<ParamField body="message" type="string">
+  Optional log message.
+</ParamField>
+
+### Output
+
+| Field             | Type      | Description          |
+| ----------------- | --------- | -------------------- |
+| `waited`          | `boolean` | Always `true`        |
+| `actualDurationMs`| `number`  | Actual duration      |
+| `message`         | `string`  | Echoed input message |
