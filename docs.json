@@ -84,7 +84,8 @@
           {
             "group": "Guides",
             "pages": [
-              "creating-nodes"
+              "creating-nodes",
+              "mcp"
             ]
           }
         ]
