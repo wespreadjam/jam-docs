@@ -108,6 +108,10 @@
         {
           "anchor": "Discord",
           "href": "https://dsc.gg/spreadjam"
+        },
+        {
+          "anchor": "npm",
+          "href": "https://www.npmjs.com/org/jam-nodes"
         }
       ]
     }
