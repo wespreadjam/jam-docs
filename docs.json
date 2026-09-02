@@ -87,6 +87,12 @@
               "creating-nodes",
               "mcp"
             ]
+          },
+          {
+            "group": "Platform API",
+            "pages": [
+              "api-reference/keywords"
+            ]
           }
         ]
       }
