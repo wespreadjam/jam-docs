@@ -1,0 +1,231 @@
+---
+title: "Keyword rankings"
+description: "List every keyword Jam tracks for your site and see where you rank on Google and the AI answer engines."
+---
+
+Jam tracks the keywords your site cares about on Google, ChatGPT, Perplexity, and Gemini, and refreshes rankings daily. The `/v1/keywords` endpoint returns that dataset so you can pipe it into your own dashboards, alerts, or agents.
+
+## Get an API key
+
+1. Open your Jam workspace and go to **Settings**, **Developer**.
+2. Click **Generate API key**.
+3. Copy the key. It is shown once. Test keys begin with `sk_test_` and are available on every plan. Live keys begin with `sk_live_` and are enabled on paid plans.
+
+<Note>
+  Keys are scoped to the workspace that created them. Regenerating a key immediately invalidates the old one.
+</Note>
+
+## Endpoint
+
+```http
+GET https://api.spreadjam.com/v1/keywords
+```
+
+Authenticate with a bearer token:
+
+```http
+Authorization: Bearer $JAM_API_KEY
+```
+
+## Try it in your terminal
+
+Export the key once per shell session, then pipe results into `jq`.
+
+```bash
+export JAM_API_KEY=sk_test_your_key_here
+
+# Ping the endpoint to check auth.
+curl -sS "https://api.spreadjam.com/v1/keywords?limit=1" \
+  -H "Authorization: Bearer $JAM_API_KEY" | jq
+
+# Pull every keyword you rank for on ChatGPT.
+curl -sS "https://api.spreadjam.com/v1/keywords?engine=chatgpt&ranked=true" \
+  -H "Authorization: Bearer $JAM_API_KEY" | jq '.keywords[] | {term, position, url}'
+```
+
+## Use with Claude
+
+The response is structured so an agent can act on it directly. The simplest setup is to run `claude` in a shell that already has `JAM_API_KEY` exported, then paste the prompt below. Claude Code calls the endpoint with its built-in shell tool and summarises what came back.
+
+<CodeGroup>
+```text Prompt for Claude Code
+You have my Jam API key exported as JAM_API_KEY. Use it to hit
+https://api.spreadjam.com/v1/keywords and show me:
+  - my top 10 ranked keywords sorted by position
+  - which ones moved up or down since last check
+  - the URL that ranks for each one
+Auth header is: Authorization: Bearer $JAM_API_KEY
+```
+</CodeGroup>
+
+For Claude Desktop, the same prompt works if you have a shell MCP server enabled. Otherwise, paste the curl output into a Claude conversation and ask for the summary you want.
+
+## Request examples
+
+<CodeGroup>
+```bash curl
+curl "https://api.spreadjam.com/v1/keywords" \
+  -H "Authorization: Bearer $JAM_API_KEY"
+```
+
+```typescript Node
+const res = await fetch('https://api.spreadjam.com/v1/keywords', {
+  headers: { Authorization: `Bearer ${process.env.JAM_API_KEY}` },
+})
+const { keywords } = await res.json()
+
+for (const k of keywords) {
+  console.log(k.term, k.engine, k.position, k.url)
+}
+```
+
+```python Python
+import os, requests
+
+res = requests.get(
+    "https://api.spreadjam.com/v1/keywords",
+    headers={"Authorization": f"Bearer {os.environ['JAM_API_KEY']}"},
+)
+for k in res.json()["keywords"]:
+    print(k["term"], k["engine"], k["position"], k["url"])
+```
+</CodeGroup>
+
+## Query parameters
+
+<ParamField query="engine" type="enum">
+  Restrict to one engine: `google`, `chatgpt`, `perplexity`, or `gemini`. Omit to include every engine Jam tracks.
+</ParamField>
+
+<ParamField query="topic" type="enum">
+  Restrict to a single topic: `seo`, `geo`, or `social`. Omit to include all topics.
+</ParamField>
+
+<ParamField query="q" type="string">
+  Optional substring filter, applied to the keyword term. Useful for pulling one cluster at a time.
+</ParamField>
+
+<ParamField query="ranked" type="boolean">
+  Pass `true` to return only keywords where you currently rank, or `false` for keywords you track but do not yet rank for.
+</ParamField>
+
+<ParamField query="limit" type="integer" default="50">
+  How many keywords to return per page. Max 200.
+</ParamField>
+
+<ParamField query="cursor" type="string">
+  Pagination cursor. Pass the `nextCursor` value from a previous response.
+</ParamField>
+
+## Response
+
+```json 200 OK
+{
+  "keywords": [
+    {
+      "term": "ai answer engine optimization",
+      "topic": "geo",
+      "engine": "chatgpt",
+      "url": "https://spreadjam.com/blogs/ai-answer-engine-optimization",
+      "position": 3,
+      "previousPosition": 5,
+      "change": 2,
+      "volume": 480,
+      "difficulty": 42,
+      "tracked": true,
+      "lastCheckedAt": "2026-09-01T18:00:00Z"
+    },
+    {
+      "term": "growth engineering",
+      "topic": "seo",
+      "engine": "google",
+      "url": "https://spreadjam.com/manifesto",
+      "position": 12,
+      "previousPosition": 18,
+      "change": 6,
+      "volume": 1900,
+      "difficulty": 55,
+      "tracked": true,
+      "lastCheckedAt": "2026-09-01T18:00:00Z"
+    },
+    {
+      "term": "cold outreach automation",
+      "topic": "seo",
+      "engine": "google",
+      "url": null,
+      "position": null,
+      "previousPosition": null,
+      "change": null,
+      "volume": 720,
+      "difficulty": 48,
+      "tracked": true,
+      "lastCheckedAt": "2026-09-01T18:00:00Z"
+    }
+  ],
+  "hasMore": false,
+  "nextCursor": null
+}
+```
+
+## Response fields
+
+<ResponseField name="keywords" type="array">
+  The list of tracked keywords.
+
+  <Expandable title="Keyword fields">
+    <ResponseField name="term" type="string">
+      The keyword as it appears in your workspace.
+    </ResponseField>
+    <ResponseField name="topic" type="enum">
+      `seo`, `geo`, or `social`. Which topic bucket the keyword belongs to.
+    </ResponseField>
+    <ResponseField name="engine" type="enum">
+      The engine this ranking is measured on: `google`, `chatgpt`, `perplexity`, or `gemini`.
+    </ResponseField>
+    <ResponseField name="url" type="string | null">
+      The page on your site that currently ranks for this keyword. `null` if you do not rank for it yet.
+    </ResponseField>
+    <ResponseField name="position" type="integer | null">
+      Your current position. Lower is better. `null` if you do not rank in the top 100.
+    </ResponseField>
+    <ResponseField name="previousPosition" type="integer | null">
+      The position from the previous refresh, for computing week-over-week movement.
+    </ResponseField>
+    <ResponseField name="change" type="integer | null">
+      Position delta since the previous check. Positive means you moved up, negative means you fell.
+    </ResponseField>
+    <ResponseField name="volume" type="integer">
+      Estimated monthly search volume from the last refresh.
+    </ResponseField>
+    <ResponseField name="difficulty" type="integer">
+      Ranking difficulty on a 0 to 100 scale.
+    </ResponseField>
+    <ResponseField name="tracked" type="boolean">
+      Whether this keyword is on your active tracked list.
+    </ResponseField>
+    <ResponseField name="lastCheckedAt" type="string">
+      ISO 8601 timestamp of the last ranking refresh.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<ResponseField name="hasMore" type="boolean">
+  `true` if another page of results is available.
+</ResponseField>
+
+<ResponseField name="nextCursor" type="string | null">
+  Pass this back as the `cursor` query param to fetch the next page.
+</ResponseField>
+
+## Errors
+
+| Status | Code                  | Description                                                                                       |
+| ------ | --------------------- | ------------------------------------------------------------------------------------------------- |
+| 400    | `invalid_parameter`   | A query parameter is malformed, out of range, or not one of the accepted enum values.             |
+| 401    | `unauthorized`        | The `Authorization` header is missing or the API key is not valid.                                |
+| 404    | `workspace_not_found` | The API key resolves to a workspace that no longer exists.                                        |
+| 429    | `rate_limited`        | You have exceeded the per-key rate limit. The `Retry-After` header tells you when to try again.   |
+
+## Rate limits
+
+Each API key is limited to 60 requests per minute. Every response carries `X-RateLimit-Remaining`, and throttled responses include `Retry-After` in seconds. Keep polling loops modest: the tracked keyword set changes at most a few times a day.
