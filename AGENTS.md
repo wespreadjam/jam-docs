@@ -8,6 +8,12 @@
 - Run `mintlify dev` to preview locally
 - Run `mintlify broken-links` to check links
 
+## API Reference tab
+
+- `api-reference/openapi.json` is GENERATED, never hand-edited. The API Reference tab is created from it by Mintlify.
+- Regenerate it from the Jam app repo when the API changes: `npm run export:openapi` (writes this file from the app's derived OpenAPI spec). Commit the result here.
+- `api-reference/overview.mdx` is the hand-written getting-started page (auth, keys); edit it freely. Per-endpoint pages come from the spec, so do not hand-write them.
+
 ## Terminology
 
 - Use "Jam" to refer to the product
