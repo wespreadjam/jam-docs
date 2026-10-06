@@ -91,10 +91,14 @@
           {
             "group": "Platform API",
             "pages": [
-              "api-reference/keywords"
+              "api-reference/overview"
             ]
           }
         ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "https://api.spreadjam.com/openapi.json"
       }
     ],
     "global": {

@@ -1,0 +1,59 @@
+---
+title: "Platform API"
+description: "Authenticate with a workspace API key and call the Jam REST API over HTTPS."
+---
+
+The Jam Platform API lets you read your AI-visibility data and manage your tracked prompts and brand profile from your own scripts, dashboards, and agents. Every endpoint is documented in the **API Reference** tab, created directly from the live OpenAPI spec so it never drifts from what the API serves.
+
+## Get an API key
+
+1. Open your Jam workspace and go to **Settings**, then **Developer**.
+2. Click **Create API key** and give it a name.
+3. Copy the key. It is shown once. Test keys begin with `sk_test_` and are available on every plan. Live keys require a paid plan.
+
+<Note>
+  Keys are scoped to the workspace that created them. Revoking a key takes effect immediately.
+</Note>
+
+## Base URL and auth
+
+```http
+https://api.spreadjam.com
+```
+
+Send your key as a bearer token on every request:
+
+```http
+Authorization: Bearer $JAM_API_KEY
+```
+
+A missing or invalid key returns `401`. Every error uses the same shape, `{ "error": string }`, with the status carrying the meaning.
+
+## Try it
+
+```bash
+export JAM_API_KEY=sk_test_your_key_here
+
+# Confirm your key and see which workspace it resolves to.
+curl -sS https://api.spreadjam.com/v1/me \
+  -H "Authorization: Bearer $JAM_API_KEY" | jq
+```
+
+## Explore the endpoints
+
+Browse the full, always-current reference in the **API Reference** tab. It covers your identity (`/v1/me`), AI-visibility analytics, keyword and topic rankings, your brand profile and competitors, and tracked prompts, each with parameters, response schemas, and a request builder. The machine-readable spec is served at [`https://api.spreadjam.com/openapi.json`](https://api.spreadjam.com/openapi.json).
+
+## Use with Claude
+
+The responses are structured so an agent can act on them directly. Run `claude` in a shell that already has `JAM_API_KEY` exported, then ask it to call an endpoint:
+
+<CodeGroup>
+```text Prompt for Claude Code
+You have my Jam API key exported as JAM_API_KEY. Use it to hit
+https://api.spreadjam.com/v1/analytics/overview and summarise my
+AI-visibility: my overall score, how it moved, and where I'm losing citations.
+Auth header is: Authorization: Bearer $JAM_API_KEY
+```
+</CodeGroup>
+
+For Claude Desktop, the same prompt works with a shell MCP server enabled. Otherwise paste the response into a conversation and ask for the summary you want.
