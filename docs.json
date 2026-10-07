@@ -98,7 +98,7 @@
       },
       {
         "tab": "API Reference",
-        "openapi": "api-reference/openapi.json"
+        "openapi": "https://api.spreadjam.com/openapi.json"
       }
     ],
     "global": {

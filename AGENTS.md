@@ -10,8 +10,8 @@
 
 ## API Reference tab
 
-- `api-reference/openapi.json` is GENERATED, never hand-edited. The API Reference tab is created from it by Mintlify.
-- Regenerate it from the Jam app repo when the API changes: `npm run export:openapi` (writes this file from the app's derived OpenAPI spec). Commit the result here.
+- The API Reference tab is created by Mintlify from the live OpenAPI spec at `https://api.spreadjam.com/openapi.json` (wired via the tab's `openapi` URL in `docs.json`). Mintlify fetches it at build time, so the published reference always matches what the API serves. There is no spec file in this repo to regenerate or commit.
+- The spec is derived from the app's route schemas; to change the reference, change the API in the Jam app repo and ship it. The docs pick up the new surface on the next Mintlify build.
 - `api-reference/overview.mdx` is the hand-written getting-started page (auth, keys); edit it freely. Per-endpoint pages come from the spec, so do not hand-write them.
 
 ## Terminology
