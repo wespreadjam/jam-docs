@@ -29,7 +29,7 @@ Jam scans ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and M
     }
     ```
 
-    `agentName` is optional (1 to 60 printable characters; without it the page says "Your agent"). `domain` is optional and must be a website hostname such as `acme.com`. Anything else is a `400 invalid_request` whose `details` names the field.
+    `agentName` is optional (1 to 60 printable characters; without it the page says "Your agent"). `domain` is optional and must be a website hostname such as `acme.com`. `email` is optional too: the human's email, if you know it. Anything else is a `400 invalid_request` whose `details` names the field.
 
     Give the human the `connectUrl` and the `userCode` together, for example: "Open this link and check that it shows the code K7M-Q2X." The approval page shows the same code, the email they are signed in with and the workspace the key will belong to (they can switch to another of their workspaces there). They sign up or sign in, set up their site (the domain you sent is filled in), choose a plan, and approve. If they already use Jam, they only approve. After they approve, the page tells them to return to you while you finish connecting.
 
