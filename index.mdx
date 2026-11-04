@@ -1,51 +1,41 @@
 ---
-title: "jam-nodes"
-description: "An extensible, type-safe workflow node framework for building automation pipelines in TypeScript."
+title: "Jam for agents"
+description: "Jam tracks how AI assistants answer the questions your buyers ask, and turns the gaps into a Plan your agent can carry out. Connect over MCP or call the REST API."
 ---
 
-## What is jam-nodes?
+Jam does GEO (generative engine optimization): it asks ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot the questions your buyers ask, records every answer, and shows whether your brand is mentioned, recommended and cited. The gaps become a Plan of actions: pages to write or fix, sources to earn, competitors to answer.
 
-jam-nodes is a modular framework for building automation workflows in TypeScript. It provides typed node definitions with Zod schema validation, a registry for managing nodes, an execution context with variable interpolation, and a playground for testing nodes.
+Everything a customer does in the Jam dashboard is open to an agent:
 
-## Architecture
-
-```
-@jam-nodes/core       -> Types, NodeRegistry, ExecutionContext, defineNode utility
-@jam-nodes/nodes      -> Built-in node definitions (logic, transform, AI, integrations)
-@jam-nodes/playground -> CLI tool for testing nodes interactively
-```
-
-core is dependency-free (except Zod + jsonpath-plus). nodes depends on core. playground provides a CLI and web interface for testing.
-
-## Explore the Docs
+- **MCP server** at `https://api.spreadjam.com/mcp`, one tool per API route. Claude.ai, Claude Desktop and ChatGPT sign in with OAuth; other clients send an API key.
+- **REST API** at `https://api.spreadjam.com/v1`, described by the [OpenAPI spec](https://api.spreadjam.com/openapi.json).
+- **Agent connect**: an agent with no key sends its human one link, and gets a key once they approve.
 
 <CardGroup cols={2}>
-  <Card title="Quick Start" href="/quickstart">
-    Install packages, create a registry, and run your first node in minutes.
+  <Card title="Quickstart for agents" href="/agents/quickstart">
+    Get a key or sign in, connect the MCP server, make your first five calls.
   </Card>
-  <Card title="Core API" href="/core/types">
-    Types, registry, execution context, and utility functions.
+  <Card title="Concepts" href="/agents/concepts">
+    Projects, prompts, scans, answers, the Plan, research, credits and paging.
   </Card>
-  <Card title="Built-in Nodes" href="/nodes/overview">
-    16 ready-to-use nodes for logic, transforms, integrations, and AI.
+  <Card title="How to operate Jam" href="/agents/operating-guide">
+    A page to paste into your agent's context so it uses Jam well.
   </Card>
-  <Card title="Playground" href="/playground/overview">
-    Test nodes interactively with the CLI or web playground.
-  </Card>
-  <Card title="Create Custom Nodes" href="/creating-nodes">
-    Build your own nodes with Zod schemas and register them with the editor.
-  </Card>
-  <Card title="MCP Integration" href="/mcp-integration">
-    Connect AI agents to jam-nodes documentation via MCP servers.
+  <Card title="Errors and limits" href="/api-reference/errors">
+    Error codes, rate limits and idempotency.
   </Card>
 </CardGroup>
 
-## Key Features
+## What an agent can do
 
-- **Type-safe** -- Zod schemas for all inputs and outputs with full TypeScript inference
-- **Extensible** -- Create custom nodes with `defineNode` and register them
-- **Playground** -- CLI and web interface for testing nodes interactively
-- **Variable interpolation** -- `{{variable}}` syntax with JSONPath and nested path resolution
-- **Credentials injection** -- Nodes receive API credentials via context and make direct HTTP calls
-- **Approval workflows** -- Built-in support for human-in-the-loop approval
-- **Notifications** -- Nodes can emit notifications through configurable channels
+- Read visibility: the overview, per-prompt numbers, the brand leaderboard, platform health and the raw AI answers.
+- Manage what is tracked: add, reword, pause or remove prompts, and edit the brand and its competitors.
+- Work the Plan: list actions, start them, draft content, open pull requests on your site, and mark them done.
+- Run scans and research when the numbers need refreshing.
+- Get notified: send Jam's notifications to your own URL with [webhooks](/agents/webhooks).
+
+Work that writes or opens pull requests spends credits. Every tool that does says so at the start of its description, and `GET /v1/credits` shows the balance.
+
+## Looking for jam-nodes?
+
+The open-source workflow node framework has moved to [jam-nodes](/jam-nodes/overview).

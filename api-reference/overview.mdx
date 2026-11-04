@@ -45,25 +45,16 @@ curl -sS https://api.spreadjam.com/v1/me \
 
 Browse the full, always-current reference in the **API Reference** tab. It covers your identity (`/v1/me`), AI-visibility analytics, keyword and topic rankings, your brand profile and competitors, and tracked prompts, each with parameters, response schemas, and a request builder. The machine-readable spec is served at [`https://api.spreadjam.com/openapi.json`](https://api.spreadjam.com/openapi.json).
 
-## Use with Claude
+## Use with Claude, ChatGPT and other agents
 
-The fastest way is the Jam MCP server, which exposes every endpoint as a tool:
+The Jam MCP server at `https://api.spreadjam.com/mcp` exposes every endpoint as a tool.
 
-```bash
-claude mcp add --transport http jam https://api.spreadjam.com/mcp --header "Authorization: Bearer $JAM_API_KEY"
-```
+- **Claude.ai or Claude Desktop:** **Settings**, **Connectors**, **Add custom connector**, then enter `https://api.spreadjam.com/mcp`. Claude opens a Jam page in your browser: sign in, check the workspace, and approve. No key is needed.
+- **ChatGPT:** add a connector (developer mode) with the URL `https://api.spreadjam.com/mcp` and OAuth authentication, then sign in and approve the same way.
+- **Claude Code:**
 
-See [Quickstart for agents](/agents/quickstart) for Cursor and other clients. You can also use plain HTTP:
+  ```bash
+  claude mcp add --transport http jam https://api.spreadjam.com/mcp --header "Authorization: Bearer $JAM_API_KEY"
+  ```
 
-The responses are structured so an agent can act on them directly. Run `claude` in a shell that already has `JAM_API_KEY` exported, then ask it to call an endpoint:
-
-<CodeGroup>
-```text Prompt for Claude Code
-You have my Jam API key exported as JAM_API_KEY. Use it to hit
-https://api.spreadjam.com/v1/analytics/overview and summarise my
-AI-visibility: my overall score, how it moved, and where I'm losing citations.
-Auth header is: Authorization: Bearer $JAM_API_KEY
-```
-</CodeGroup>
-
-For Claude Desktop, the same prompt works with a shell MCP server enabled. Otherwise paste the response into a conversation and ask for the summary you want.
+A connector shows up in **Settings**, **Developer** as a key named after the client, for example "Claude (connector)". Revoke it there to disconnect. See [Quickstart for agents](/agents/quickstart) for Cursor and other clients, and [How to operate Jam](/agents/operating-guide) for instructions to give your agent.

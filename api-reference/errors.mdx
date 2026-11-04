@@ -47,7 +47,7 @@ Over MCP, an error comes back as a tool result with `isError: true` and this bod
 | <a id="unprocessable" />`unprocessable` | 422 | The resource can never accept this request as sent. |
 | <a id="idempotency_key_reused" />`idempotency_key_reused` | 422 | The `Idempotency-Key` was used for a different request. Use a new key. |
 | <a id="rate_limited" />`rate_limited` | 429 | Wait `Retry-After` seconds, then retry. |
-| <a id="too_many_concurrent" />`too_many_concurrent` | 429 | Too many slow reads in flight for this key. Wait for one to finish. |
+| <a id="too_many_concurrent" />`too_many_concurrent` | 429 | Too many slow reads in flight, for this key or across the API. Wait `Retry-After` seconds, then retry. |
 | <a id="upstream_failed" />`upstream_failed` | 502 | A downstream system did not take the work; nothing was written. Retry later. |
 | <a id="internal_error" />`internal_error` | 500 | Unexpected. Retry once, then email support with the `requestId`. |
 
@@ -63,6 +63,8 @@ Limits are per API key.
 Every response with a key carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the bucket is full). Over the limit you get `429 rate_limited` with `Retry-After` in seconds.
 
 At most 4 of these slow reads run at once per key: `GET /v1/analytics/overview`, `/v1/analytics/prompts`, `/v1/analytics/metrics`, `/v1/keywords` and `/v1/opportunities/{id}/brief`. The fifth gets `429 too_many_concurrent` with `Retry-After: 2`.
+
+Across all keys, the API runs at most 2 of these slow reads at once. A slow read over that cap waits up to 5 seconds for a slot, then gets `429 too_many_concurrent` with `Retry-After: 5`. Wait that long and retry; the cap protects every other request from slowing down.
 
 Agent connect has no key, so it is limited per IP address: 10 new sessions per 10 minutes, and 120 polls per minute. Its `429` uses the same error body (`rate_limited`) and `Retry-After`.
 

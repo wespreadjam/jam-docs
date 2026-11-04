@@ -24,7 +24,7 @@
   "metadata": {
     "og:image": "/images/og-image.png",
     "og:site_name": "Jam Docs",
-    "og:description": "Documentation for Jam, the AI growth agent for builders"
+    "og:description": "Jam for agents: track how AI assistants answer your buyers, and carry out the Plan over MCP or the REST API."
   },
   "favicon": "/favicon.svg",
   "fonts": {
@@ -50,6 +50,7 @@
           {
             "group": "GEO for agents",
             "pages": [
+              "index",
               "agents/quickstart",
               "agents/concepts",
               "agents/operating-guide",
@@ -61,7 +62,7 @@
           {
             "group": "jam-nodes: getting started",
             "pages": [
-              "index",
+              "jam-nodes/overview",
               "quickstart"
             ]
           },
@@ -163,5 +164,11 @@
       "linkedin": "https://www.linkedin.com/company/108739060/",
       "discord": "https://dsc.gg/spreadjam"
     }
-  }
+  },
+  "redirects": [
+    {
+      "source": "/jam-nodes",
+      "destination": "/jam-nodes/overview"
+    }
+  ]
 }

@@ -113,12 +113,14 @@ auth=(-H "Authorization: Bearer $JAM_API_KEY")
 
 curl -sS "${auth[@]}" $JAM/me                  # which workspace this key is for
 curl -sS "${auth[@]}" $JAM/analytics/overview  # visibility, mentions, citations
-curl -sS "${auth[@]}" $JAM/prompts             # what is tracked
+curl -sS "${auth[@]}" "$JAM/prompts?limit=20"  # what is tracked, one page
 curl -sS "${auth[@]}" $JAM/actions             # the Plan: what to do next
 curl -sS "${auth[@]}" $JAM/credits             # credits left and when they reset
 ```
 
-Over MCP these are `get_me`, `get_analytics_overview`, `list_prompts`, `list_actions` and `get_credits`.
+Over MCP these are `get_me`, `get_analytics_overview`, `list_prompts` (with `limit: 20`), `list_actions` and `get_credits`.
+
+Always send `limit` to `/v1/prompts`: without it the response also carries the older `tracked` and `archived` lists next to the first page, which is a few hundred KB on a large project. The first `analytics` read of a project can take several seconds while Jam builds its numbers; later reads are fast until a new scan lands.
 
 ## Next
 

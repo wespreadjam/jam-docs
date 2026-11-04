@@ -73,7 +73,9 @@ Lists that can grow are paged the same way: `limit` (1 to 100) and `cursor` in, 
 "pageInfo": { "limit": 100, "hasNextPage": true, "nextCursor": "eyJhIjo...", "totalCount": 326 }
 ```
 
-When `hasNextPage` is true, send `nextCursor` back as `cursor` with the same filters for the next page. `totalCount` counts every matching item across all pages. A `limit` outside 1 to 100, or a cursor the API did not hand out, is a `400`. This shape is used by `GET /v1/prompts`, `/v1/actions`, `/v1/opportunities`, `/v1/content` and `/v1/analytics/prompts`. Counts that summarise a list (`countsByStatus` on actions, `counts` on prompts) always cover every page.
+When `hasNextPage` is true, send `nextCursor` back as `cursor` with the same filters for the next page. `totalCount` counts every matching item across all pages. A `limit` outside 1 to 100, or a cursor the API did not hand out, is a `400`. This shape is used by `GET /v1/prompts`, `/v1/actions`, `/v1/opportunities`, `/v1/content`, `/v1/analytics/prompts`, `/v1/answers` and `/v1/visibility-runs`. Counts that summarise a list (`countsByStatus` on actions, `counts` on prompts) always cover every page.
+
+Older fields stay for clients that already read them: `/v1/answers` also has `nextCursor` at the top level, and `/v1/visibility-runs` has `nextBefore` (and accepts `before` as well as `cursor`). `/v1/answers` leaves out `totalCount` when you filter by `competitor`, because counting would read every answer. Without `limit`, `GET /v1/prompts` also returns the older `tracked` and `archived` lists beside the first page, so send `limit`.
 
 ## Webhooks and notifications
 
