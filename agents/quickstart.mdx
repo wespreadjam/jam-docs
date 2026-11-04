@@ -48,6 +48,10 @@ Jam scans ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and M
     | `expired` | Nobody approved within two hours. Start a new session. |
 
     Starting sessions is limited to 10 per IP address every 10 minutes.
+
+    <Tip>
+    **Python: set a `User-Agent` header.** The API sits behind Cloudflare, which blocks the default `Python-urllib/3.x` user agent with `403` ("error code: 1010"). Send your own, for example `urllib.request.Request(url, headers={"User-Agent": "my-agent/1.0"})`, and do the same with any HTTP client whose requests come back `403` with that body.
+    </Tip>
   </Tab>
   <Tab title="From the dashboard">
     1. Open Jam and go to **Settings**, then **Developer**.

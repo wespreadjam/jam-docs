@@ -45,7 +45,7 @@
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
+        "tab": "GEO for agents",
         "groups": [
           {
             "group": "GEO for agents",
@@ -54,11 +54,25 @@
               "agents/quickstart",
               "agents/concepts",
               "agents/operating-guide",
-              "agents/webhooks",
+              "agents/webhooks"
+            ]
+          },
+          {
+            "group": "API",
+            "pages": [
               "api-reference/overview",
               "api-reference/errors"
             ]
-          },
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "openapi": "https://api.spreadjam.com/openapi.json"
+      },
+      {
+        "tab": "jam-nodes (workflow library)",
+        "groups": [
           {
             "group": "jam-nodes: getting started",
             "pages": [
@@ -101,10 +115,6 @@
             ]
           }
         ]
-      },
-      {
-        "tab": "API Reference",
-        "openapi": "https://api.spreadjam.com/openapi.json"
       }
     ],
     "global": {
@@ -155,7 +165,14 @@
     }
   },
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude", "cursor", "mcp"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude",
+      "cursor",
+      "mcp"
+    ]
   },
   "footer": {
     "socials": {

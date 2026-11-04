@@ -36,7 +36,10 @@ Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Pla
 - Summarise numbers the way the dashboard does: visibility score and citation share are
   0 to 100.
 - Before a write that costs credits or changes what is tracked (adding prompts, scans,
-  asking Jam to write content), tell the human what it will do and get a yes.
+  asking Jam to write content), tell the human what it will do and get a yes. One spend
+  happens without a request: when the first research run finishes, Jam drafts the top 3
+  new pages from the plan's included credits. Expect it; do not report it as unexplained.
+- Read scan progress against `expectedTotal`, not `answers.total`, while `queuing` is true.
 - `create_visibility_run` only when the human asks for fresh numbers; it answers 409 while
   a scan runs. Do not start another; check back after `expectedMinutes`.
 - Send `Idempotency-Key` on writes you might retry.

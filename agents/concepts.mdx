@@ -21,13 +21,25 @@ A prompt is a question a buyer asks an AI assistant, like "best invoicing tool f
 
 A scan asks every tracked prompt on every platform the plan covers: ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot. Scans run on the plan's cadence (daily, every other day or weekly). `POST /v1/visibility-runs` starts one now; it answers `202` with a `runId` and the expected minutes, or `409` while a scan is already running.
 
+A run fills in as Jam queues its questions, so `answers.total` grows during the first minutes. Read progress against `expectedTotal`, the prompt and platform pairs the run will ask, which is known up front; `queuing` is `true` until every question is queued. A platform that could not be reached shows its failed answers with a plain cause in `platforms[].errors`, and the project's `healthReasons` names a platform that failed most of the latest scan.
+
 ## Answers
 
 Each scan stores the AI answer for every prompt and platform: whether your brand was mentioned or recommended, its position, the brands mentioned in order, and the URLs cited. `GET /v1/answers` lists them newest first; `GET /v1/prompts/{promptId}/answers` is one prompt's history.
 
 ## Analytics
 
-The numbers on the dashboard: visibility score, mentions, citation share (a 0 to 100 percentage) and how they moved. `GET /v1/analytics/overview` for the summary, `/v1/analytics/prompts` per prompt, `/v1/analytics/metrics` for platforms, competitors, sources and topics.
+The numbers on the dashboard: visibility score, mentions, citation share (a 0 to 100 percentage) and how they moved. `GET /v1/analytics/overview` for the summary, `/v1/analytics/prompts` per prompt, `/v1/analytics/metrics` for chart rows by family:
+
+| `metric` | One row per |
+| --- | --- |
+| `visibility`, `competitors` | Day and brand: the visibility score over the window. |
+| `citations` | Tracked brand (yours and competitors): its brand citation share, mentions and rank. |
+| `sources` | Cited domain: how many cited URLs and answers it appears in, each as a count and a 0 to 100 share, with your own site marked `isOwned: true`. |
+| `platforms` | AI platform: its scores, answer count and latest-scan failures. |
+| `topics` | Topic and brand: visibility within the topic. |
+
+`citations` answers "which brands get cited"; `sources` answers "which sites the AI assistants cite". Both use the same window (`rangeDays`: 7, 30 or 90).
 
 ## Brand and competitors
 
@@ -57,9 +69,15 @@ Transitions are safe to repeat: starting a started action, or dismissing a dismi
 
 Opportunities are pages worth writing. `GET /v1/opportunities` lists them and `GET /v1/opportunities/{id}/brief` returns the brief to write from. An agent can claim one, write it, and store the draft with `POST /v1/content`; Jam can also write it for you (`POST /v1/opportunities/{id}/plan-requests`). Publish to a connected GitHub repository with `PUT /v1/content/{id}/destinations/{destinationId}`.
 
+A draft's text is at `currentRevision.article.bodyMarkdown` on `GET /v1/content/{id}` (the list view carries the title and state, not the body).
+
 ## Credits
 
-Work Jam does for you (writing, research, outreach) costs credits. The plan grants an allowance that resets each period. `GET /v1/credits` shows the balance, allowance, reset time and recent charges. A request that needs more credits than you have answers `402 insufficient_credits`.
+Work Jam does for you (writing, research, outreach) costs credits. The plan grants an allowance that resets each period. `GET /v1/credits` shows the balance, allowance, reset time and recent charges; each charge has a plain `description` and `spend: false` when it is bookkeeping rather than work. A new account's first row is a `geo_allowance_expiry`: the free allowance replaced by the plan's credits, not a spend. A request that needs more credits than you have answers `402 insufficient_credits`.
+
+<Note>
+When a project's first research run finishes, Jam drafts the top 3 new pages on the Plan by itself, once per project, paid from the plan's included credits. Those actions go `in_progress` with actor `jam`, and `llm_query` charges appear in `recentCharges` without a request from you. The drafts stay in Jam until someone publishes them; nothing is sent to your site. Later research runs draft nothing on their own: more drafts wait for a request (`POST /v1/plan-batches` or a single action).
+</Note>
 
 ## Plan state and billing
 
