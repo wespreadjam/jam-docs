@@ -1,6 +1,6 @@
 ---
 title: "Quickstart for agents"
-description: "Connect Claude Code, Cursor or any agent to Jam: get a key, add the MCP server, make your first five calls."
+description: "Connect Claude, ChatGPT, Claude Code, Cursor or any agent to Jam: sign in or get a key, add the MCP server, make your first five calls."
 ---
 
 Jam tracks how AI assistants answer the questions your buyers ask, and turns the gaps into a Plan of actions. Everything a customer does in the dashboard is available to an agent through the REST API at `https://api.spreadjam.com/v1` and the MCP server at `https://api.spreadjam.com/mcp`.
@@ -60,7 +60,20 @@ Keys look like `sk_` followed by 64 hex characters. A key reaches its workspace'
 
 ## 2. Connect over MCP
 
-The MCP server exposes every API route as a tool, named by its operation id (`get_me`, `list_prompts`, `list_actions`, ...). It uses the same key.
+The MCP server exposes every API route as a tool, named by its operation id (`get_me`, `list_prompts`, `list_actions`, ...).
+
+### Claude.ai, Claude Desktop, ChatGPT: sign in, no key
+
+Clients that support OAuth connectors sign in to Jam directly, so you skip step 1.
+
+- **Claude.ai or Claude Desktop:** **Settings**, **Connectors**, **Add custom connector**, then enter `https://api.spreadjam.com/mcp`.
+- **ChatGPT:** add a connector (developer mode) with the URL `https://api.spreadjam.com/mcp` and OAuth authentication.
+
+The client opens a Jam page in your browser. Sign in (or sign up and choose a plan), check the workspace and where you will be sent back to, and approve. The connection appears in **Settings**, **Developer** as a key named after the client, for example "Claude (connector)"; revoke it there to disconnect.
+
+### With an API key
+
+Other clients send the key from step 1.
 
 <CodeGroup>
 ```bash Claude Code
