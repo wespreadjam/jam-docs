@@ -7,13 +7,15 @@ description: "The nouns of Jam's GEO API: workspaces, projects, prompts, scans, 
 
 An API key belongs to one workspace. Possession of the key is access to that workspace: everything the key reads or changes is scoped to it. `GET /v1/me` names the workspace and the person who created the key.
 
+A key acts with its creator's current role in the workspace. A member's key can do what a member can do in the dashboard; owner-only actions (managing billing) need the owner. If the creator leaves the workspace, their keys stop working. A key cannot create other keys, and can revoke only itself.
+
 ## Project
 
-A project is one website Jam tracks, with its brand, competitors and prompts. A workspace usually has one. Requests act on the newest active project unless you send `X-Jam-Project: <projectId>`.
+A project is one website Jam tracks, with its brand, competitors and prompts. A workspace usually has one. `GET /v1/projects` lists them. Every project-scoped route (analytics, answers, prompts, brand, the Plan, research, opportunities, content, destinations, scans and `/v1/me`) acts on the newest active project unless you send `X-Jam-Project: <projectId>`. Routes for one item by id (`/v1/actions/{actionId}`, `/v1/content/{contentId}`, ...) act on that item wherever it lives in the workspace. A header that is not a project id answers `400 invalid_request`; a project outside the workspace answers `404 not_found`. Over MCP, pass `projectId` to the tool instead.
 
 ## Prompts
 
-A prompt is a question a buyer asks an AI assistant, like "best invoicing tool for freelancers". Jam asks each tracked prompt on every platform on every scan. Your plan sets how many prompts you can track; `GET /v1/prompts/cap` shows the cap and how much room is left. Add, edit, pause, replace and remove prompts under `/v1/prompts`, or ask Jam to suggest more with `POST /v1/prompts/suggestions`.
+A prompt is a question a buyer asks an AI assistant, like "best invoicing tool for freelancers". Jam asks each tracked prompt on every platform on every scan. Each prompt has a `topic`, an `intent` and a `persona` (`discoverer`, `buyer`, `evaluator`, `competitor`, `branded` or `control`, the same values `POST /v1/prompts` takes). They are set when the prompt is added; `PATCH /v1/prompts/{promptId}` changes only the wording, so to change a topic or persona, remove the prompt and add it again. Your plan sets how many prompts you can track; `GET /v1/prompts/cap` shows the cap and how much room is left. Add, edit, pause, replace and remove prompts under `/v1/prompts`, or ask Jam to suggest more with `POST /v1/prompts/suggestions`.
 
 ## Scans (visibility runs)
 
@@ -49,6 +51,8 @@ The Plan is the ranked list of actions that should raise your visibility: pages 
 | `dismissed` | Taken off the Plan. |
 | `superseded` | Research no longer proposes it. |
 
+Transitions are safe to repeat: starting a started action, or dismissing a dismissed one, answers `200` with the status and records nothing. There is no undo for start (the dashboard has none either). To take a started action off the Plan, dismiss it; restoring it (`DELETE /v1/actions/{actionId}/dismissal`) puts it back as `suggested`.
+
 ## Content opportunities
 
 Opportunities are pages worth writing. `GET /v1/opportunities` lists them and `GET /v1/opportunities/{id}/brief` returns the brief to write from. An agent can claim one, write it, and store the draft with `POST /v1/content`; Jam can also write it for you (`POST /v1/opportunities/{id}/plan-requests`). Publish to a connected GitHub repository with `PUT /v1/content/{id}/destinations/{destinationId}`.
@@ -57,6 +61,20 @@ Opportunities are pages worth writing. `GET /v1/opportunities` lists them and `G
 
 Work Jam does for you (writing, research, outreach) costs credits. The plan grants an allowance that resets each period. `GET /v1/credits` shows the balance, allowance, reset time and recent charges. A request that needs more credits than you have answers `402 insufficient_credits`.
 
-## Plan state
+## Plan state and billing
 
-When a plan ends the workspace becomes read-only: reads keep working and writes answer `402 plan_inactive` until the plan is resumed in the dashboard.
+When a plan ends the workspace becomes read-only: reads keep working and writes answer `402 plan_inactive` until the plan is resumed in the dashboard. Every `402` carries `resolveUrl`, the dashboard page where a person fixes it. `GET /v1/billing` returns the plan state, whether this key's creator can manage billing (`canManage`, owners only) and the links to manage billing, resume the plan, buy credits and change plan. The API never charges a card or opens a checkout itself: a person does that on those pages.
+
+## Lists and pages
+
+Lists that can grow are paged the same way: `limit` (1 to 100) and `cursor` in, and a `pageInfo` object out.
+
+```json
+"pageInfo": { "limit": 100, "hasNextPage": true, "nextCursor": "eyJhIjo...", "totalCount": 326 }
+```
+
+When `hasNextPage` is true, send `nextCursor` back as `cursor` with the same filters for the next page. `totalCount` counts every matching item across all pages. A `limit` outside 1 to 100, or a cursor the API did not hand out, is a `400`. This shape is used by `GET /v1/prompts`, `/v1/actions`, `/v1/opportunities`, `/v1/content` and `/v1/analytics/prompts`. Counts that summarise a list (`countsByStatus` on actions, `counts` on prompts) always cover every page.
+
+## Webhooks and notifications
+
+Jam can POST its notifications (plan ready, PR opened, scan failed, ...) to your own URL. Manage the URLs with `/v1/webhooks` and choose which notifications go there with `/v1/notification-rules`. See [Webhooks](/agents/webhooks).

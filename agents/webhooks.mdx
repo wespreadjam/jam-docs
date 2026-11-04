@@ -1,0 +1,74 @@
+---
+title: "Webhooks"
+description: "Receive Jam's notifications at your own URL, choose which ones are sent, and verify each delivery's signature."
+---
+
+Jam can POST its notifications to a URL you run: a plan is ready, a pull request opened, a scan failed. Any member of the workspace can manage webhooks, from **Settings**, **Notifications** or from the API.
+
+## Add a webhook
+
+```bash
+curl -sS -X POST https://api.spreadjam.com/v1/webhooks \
+  -H "Authorization: Bearer $JAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: add-ops-hook" \
+  -d '{"name": "Ops alerts", "url": "https://hooks.example.com/jam"}'
+```
+
+The URL must be a public `https` address; private, loopback and cloud metadata addresses are refused. The answer includes the webhook's `signingSecret`. `GET /v1/webhooks` lists every webhook with its secret, `PATCH /v1/webhooks/{webhookId}` renames, enables or disables one, and `DELETE` removes it. Over MCP these are `list_webhooks`, `create_webhook`, `update_webhook` and `delete_webhook`.
+
+## Choose what is sent
+
+Each person in the workspace has a rule per notification category: `action_required`, `error`, `status_update`, `insight` and `completion`. A category reaches your webhooks when its rule lists the `custom_webhook` channel.
+
+```bash
+curl -sS -X PATCH https://api.spreadjam.com/v1/notification-rules/completion \
+  -H "Authorization: Bearer $JAM_API_KEY" \
+  -H "Content-Type: application/json" \
+  -d '{"channels": ["chat", "custom_webhook"]}'
+```
+
+`GET /v1/notification-rules` lists the rules. They belong to the person who created the key, as each member sets their own in the dashboard.
+
+## What a delivery looks like
+
+```json
+{
+  "event": "notification",
+  "notification": {
+    "title": "Your plan is ready",
+    "message": "...",
+    "priority": "medium",
+    "timestamp": "2026-11-04T10:00:00.000Z",
+    "data": { "type": "geo_completion", "geoEventType": "geo.plan.ready", "projectId": "...", "dashboardHref": "..." }
+  }
+}
+```
+
+`notification.data.type` names the notification. GEO notifications are `geo_action_required`, `geo_error`, `geo_completion`, `geo_insight` and `geo_status_update`, and their `data` carries ids and a dashboard link, never drafts, diffs or pull request contents.
+
+## Verify the signature
+
+Every delivery carries three headers:
+
+| Header | Value |
+| --- | --- |
+| `X-Jam-Webhook-Id` | The webhook's id. |
+| `X-Jam-Timestamp` | When it was sent, in unix seconds. |
+| `X-Jam-Signature` | `v1=` followed by the hex HMAC-SHA256 of `<timestamp>.<raw body>`, keyed by the webhook's `signingSecret`. |
+
+Read the raw body before parsing it, recompute the signature, compare in constant time, and reject a timestamp more than five minutes old.
+
+```js
+import { createHmac, timingSafeEqual } from 'node:crypto'
+
+export function verifyJamWebhook(secret, rawBody, headers) {
+  const ts = headers['x-jam-timestamp']
+  if (!ts || Math.abs(Date.now() / 1000 - Number(ts)) > 300) return false
+  const expected = 'v1=' + createHmac('sha256', secret).update(`${ts}.${rawBody}`).digest('hex')
+  const got = headers['x-jam-signature'] ?? ''
+  return got.length === expected.length && timingSafeEqual(Buffer.from(got), Buffer.from(expected))
+}
+```
+
+The settings page has a **Test** button that sends a test notification with empty `data`.

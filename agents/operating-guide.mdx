@@ -18,7 +18,8 @@ Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Pla
 
 ## No key yet
 1. `POST /v1/agent-connect` with `{"domain": "<site>", "agentName": "<your name>"}`.
-2. Show the human the `connectUrl`. Say: open it, sign up, set up the site, approve.
+2. Show the human the `connectUrl` and the `userCode`. Say: open it, check that the page
+   shows this code, sign up, set up the site, approve. If the codes do not match, they decline.
 3. Poll `GET /v1/agent-connect/{pollToken}` every `intervalSeconds` until `status` is
    `approved`. Save `apiKey` immediately (it is shown once). Never print the poll token or key.
 
@@ -42,7 +43,13 @@ Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Pla
 - On an error, read `code` and `error`; `details` says which field and what is accepted.
   `429`: wait `Retry-After` seconds. `402 plan_inactive`: the plan ended, tell the human to
   resume it in the dashboard. `402 insufficient_credits`: tell the human.
-- Several sites? Send `X-Jam-Project: <projectId>`; otherwise the newest project is used.
+- Several sites? Pass `projectId` to the tool (or send `X-Jam-Project: <projectId>`);
+  otherwise the newest project is used.
+- Lists are paged: when `pageInfo.hasNextPage` is true, call again with
+  `cursor: pageInfo.nextCursor` and the same filters. `totalCount` is the full size.
+- Tools marked `destructiveHint` spend credits, publish or delete; their description says
+  the cost. Ask first.
+- `402`: open `resolveUrl` with the human, or read `get_billing` for the links.
 - Quote `requestId` when you report a problem to support.
 ````
 

@@ -22,13 +22,15 @@ Every error has the same JSON body:
 - `requestId` matches the `X-Request-Id` response header. Quote it to support. You can send your own `X-Request-Id`.
 - `details` appears on validation errors, one entry per field, with what is accepted (`allowed`, `minimum`, `maximum`, `expected`).
 
-Over MCP, an error comes back as a tool result with `isError: true` and this body as its text.
+Every `402` (and a `403 plan_required`) also carries `resolveUrl`, the dashboard page where a person fixes it: resume the plan, buy credits or manage billing. `GET /v1/billing` lists all of these links.
+
+Over MCP, an error comes back as a tool result with `isError: true` and this body as its text. A tool called without a required path argument (for example `get_action` with no `actionId`) answers `invalid_request` with "actionId is required" before any request is made.
 
 ## Codes
 
 | Code | Status | What to do |
 | --- | --- | --- |
-| <a id="invalid_request" />`invalid_request` | 400 | Fix the fields named in `details`. |
+| <a id="invalid_request" />`invalid_request` | 400 | Fix the fields named in `details`. Also a malformed `X-Jam-Project` header, a `limit` outside 1 to 100, or a `cursor` the API did not hand out. |
 | <a id="body_required" />`body_required` | 400 | Send a JSON body with `Content-Type: application/json` (`{}` when every field is optional). |
 | <a id="malformed_json" />`malformed_json` | 400 | The body is not valid JSON. |
 | <a id="unsupported_media_type" />`unsupported_media_type` | 415 | Send the body as JSON. |
@@ -39,9 +41,9 @@ Over MCP, an error comes back as a tool result with `isError: true` and this bod
 | <a id="plan_inactive" />`plan_inactive` | 402 | The plan ended. Reads work; writes wait until the plan is resumed in the dashboard. |
 | <a id="insufficient_credits" />`insufficient_credits` | 402 | Not enough credits. Check `GET /v1/credits`; add credits or wait for the reset. |
 | <a id="payment_required" />`payment_required` | 402 | Another payment step is missing. |
-| <a id="not_found" />`not_found` | 404 | No such resource in this workspace, or no such route. API paths start with `/v1`. |
+| <a id="not_found" />`not_found` | 404 | No such resource in this workspace, or no such route. API paths start with `/v1`. Also an `X-Jam-Project` that is not an active project of the workspace: list them with `GET /v1/projects`. |
 | <a id="method_not_allowed" />`method_not_allowed` | 405 | The path exists with other methods, listed in the `Allow` header. |
-| <a id="conflict" />`conflict` | 409 | The resource's state does not allow this yet (for example a scan is already running). Change the state or retry later. |
+| <a id="conflict" />`conflict` | 409 | The resource's state does not allow this yet (for example a scan is already running). Change the state or retry later. Repeating a change that already happened (pausing a paused prompt, starting a started action, dismissing a dismissed one) is not a conflict: it answers `200`. |
 | <a id="unprocessable" />`unprocessable` | 422 | The resource can never accept this request as sent. |
 | <a id="idempotency_key_reused" />`idempotency_key_reused` | 422 | The `Idempotency-Key` was used for a different request. Use a new key. |
 | <a id="rate_limited" />`rate_limited` | 429 | Wait `Retry-After` seconds, then retry. |
@@ -62,13 +64,13 @@ Every response with a key carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` a
 
 At most 4 of these slow reads run at once per key: `GET /v1/analytics/overview`, `/v1/analytics/prompts`, `/v1/analytics/metrics`, `/v1/keywords` and `/v1/opportunities/{id}/brief`. The fifth gets `429 too_many_concurrent` with `Retry-After: 2`.
 
-Agent connect has no key, so it is limited per IP address: 10 new sessions per 10 minutes, and 120 polls per minute.
+Agent connect has no key, so it is limited per IP address: 10 new sessions per 10 minutes, and 120 polls per minute. Its `429` uses the same error body (`rate_limited`) and `Retry-After`.
 
 ## Idempotency
 
-Send `Idempotency-Key: <any string, 1 to 255 characters>` on a write you might retry. It is honoured on `POST /v1/prompts`, `/v1/prompts/bulk`, `/v1/visibility-runs`, `/v1/plan-batches`, `/v1/opportunities/{id}/plan-requests`, `/v1/content` and `/v1/api-keys`.
+Send `Idempotency-Key: <any string, 1 to 255 characters>` on a write you might retry. It is honoured on `POST /v1/prompts`, `/v1/prompts/bulk`, `/v1/visibility-runs`, `/v1/plan-batches`, `/v1/opportunities/{id}/plan-requests`, `/v1/content`, `/v1/actions/{id}/executions`, `/v1/site-changes/{id}/pull-requests`, `/v1/research-requests`, `/v1/brand/competitors` and `/v1/webhooks`.
 
-- The same key with the same request within 24 hours returns the first response again, with `Idempotent-Replayed: true`.
+- The same key with the same request within 24 hours returns the first response again, with `Idempotent-Replayed: true` and the usual `X-Request-Id` and `X-RateLimit-*` headers.
 - Only successful responses are kept, so a failed attempt can be retried with the same key.
 - The same key with a different method, path or body answers `422 idempotency_key_reused`.
 - The same key while the first request is still running answers `409 conflict`. Retry shortly.

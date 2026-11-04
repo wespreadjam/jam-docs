@@ -53,6 +53,7 @@
               "agents/quickstart",
               "agents/concepts",
               "agents/operating-guide",
+              "agents/webhooks",
               "api-reference/overview",
               "api-reference/errors"
             ]

@@ -22,13 +22,16 @@ Jam scans ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and M
     ```json
     {
       "connectUrl": "https://www.spreadjam.com/connect/ABCD234567",
+      "userCode": "K7M-Q2X",
       "pollToken": "jcp_...",
       "expiresAt": "2026-11-04T12:00:00.000Z",
       "intervalSeconds": 5
     }
     ```
 
-    Give the human the `connectUrl`. They sign up or sign in, set up their site (the domain you sent is filled in), choose a plan, and approve. If they already use Jam, they only approve.
+    `agentName` is optional (1 to 60 printable characters; without it the page says "Your agent"). `domain` is optional and must be a website hostname such as `acme.com`. Anything else is a `400 invalid_request` whose `details` names the field.
+
+    Give the human the `connectUrl` and the `userCode` together, for example: "Open this link and check that it shows the code K7M-Q2X." The approval page shows the same code, the email they are signed in with and the workspace the key will belong to (they can switch to another of their workspaces there). They sign up or sign in, set up their site (the domain you sent is filled in), choose a plan, and approve. If they already use Jam, they only approve. After they approve, the page tells them to return to you while you finish connecting.
 
     Keep the `pollToken` secret, and poll every `intervalSeconds`:
 
@@ -53,7 +56,7 @@ Jam scans ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and M
   </Tab>
 </Tabs>
 
-Keys look like `sk_` followed by 64 hex characters. A key reaches its workspace's real data; there are no test keys. Revoke a key in **Settings**, **Developer**.
+Keys look like `sk_` followed by 64 hex characters. A key reaches its workspace's real data; there are no test keys. It can read everything in the workspace and make the changes its creator can make in the dashboard, including work that spends credits; it acts with its creator's role, so a member's key cannot do owner-only things such as managing billing. Revoke a key in **Settings**, **Developer** (a key can also revoke itself with `DELETE /v1/api-keys/{keyId}`).
 
 ## 2. Connect over MCP
 
@@ -77,7 +80,15 @@ claude mcp add --transport http jam https://api.spreadjam.com/mcp \
 ```
 </CodeGroup>
 
-To work on a project other than your newest one, also send `X-Jam-Project: <projectId>`.
+Tools are annotated, so your client can auto-approve the safe ones and ask before the rest:
+
+- Reads are `readOnlyHint: true`.
+- Tools that spend credits, publish to your site or repository, or delete something are `destructiveHint: true`. A tool that spends credits says what it costs at the start of its description (for example `create_research_request`: "Costs 500 credits (the first research run is free).").
+- Tools that are safe to repeat are `idempotentHint: true`.
+
+Tools a key can never use (creating API keys, the key-less agent-connect calls) are not listed.
+
+To work on a project other than your newest one, pass `projectId` (an id from `list_projects`) to any project tool, or send `X-Jam-Project: <projectId>` with the MCP connection. The argument wins for that one call.
 
 Prefer plain HTTP? Use the [OpenAPI spec](https://api.spreadjam.com/openapi.json) and send `Authorization: Bearer $JAM_API_KEY` on every request.
 
