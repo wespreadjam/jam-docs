@@ -1,0 +1,51 @@
+---
+title: "How to operate Jam"
+description: "A guide to paste into your agent's context (AGENTS.md, CLAUDE.md, a skill or a system prompt) so it uses Jam well."
+---
+
+Copy the block below into your agent's instructions. It assumes the Jam MCP server is connected or `JAM_API_KEY` is set.
+
+````markdown
+# Jam (AI search visibility)
+
+Jam tracks how ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and
+Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Plan of actions.
+
+- REST: https://api.spreadjam.com/v1, header `Authorization: Bearer $JAM_API_KEY`.
+  Spec: https://api.spreadjam.com/openapi.json
+- MCP: https://api.spreadjam.com/mcp (same header). Tool names are the operation ids below.
+- Docs: https://docs.spreadjam.com. Support: jia@spreadjam.com, mal@spreadjam.com.
+
+## No key yet
+1. `POST /v1/agent-connect` with `{"domain": "<site>", "agentName": "<your name>"}`.
+2. Show the human the `connectUrl`. Say: open it, sign up, set up the site, approve.
+3. Poll `GET /v1/agent-connect/{pollToken}` every `intervalSeconds` until `status` is
+   `approved`. Save `apiKey` immediately (it is shown once). Never print the poll token or key.
+
+## Each session, in this order
+1. `get_me` (GET /v1/me): confirm the workspace.
+2. Where things stand: `get_analytics_overview`, `list_prompts`, `get_prompt_cap`, `get_credits`.
+3. Detail when asked: `list_prompt_analytics`, `list_analytics_metrics`, `get_brand`,
+   the AI answers for a prompt.
+4. The Plan: `list_actions` (status `suggested` first), `list_opportunities`,
+   `get_opportunity_brief`.
+5. Act, then report: do the action, then `complete_action` with the URL of what changed.
+
+## Rules
+- Summarise numbers the way the dashboard does: visibility score and citation share are
+  0 to 100.
+- Before a write that costs credits or changes what is tracked (adding prompts, scans,
+  asking Jam to write content), tell the human what it will do and get a yes.
+- `create_visibility_run` only when the human asks for fresh numbers; it answers 409 while
+  a scan runs. Do not start another; check back after `expectedMinutes`.
+- Send `Idempotency-Key` on writes you might retry.
+- On an error, read `code` and `error`; `details` says which field and what is accepted.
+  `429`: wait `Retry-After` seconds. `402 plan_inactive`: the plan ended, tell the human to
+  resume it in the dashboard. `402 insufficient_credits`: tell the human.
+- Several sites? Send `X-Jam-Project: <projectId>`; otherwise the newest project is used.
+- Quote `requestId` when you report a problem to support.
+````
+
+## Why this order
+
+Reading `/v1/me` first catches a key for the wrong workspace before anything else. The overview and prompts tell you whether there is data yet: a project that has not finished its first scan has empty analytics. The Plan is where the next step comes from, so an agent asked "what should I do" reads `list_actions` rather than inventing advice from the numbers.

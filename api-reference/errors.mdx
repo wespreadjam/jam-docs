@@ -1,0 +1,80 @@
+---
+title: "Errors and limits"
+description: "Error codes, rate limits, idempotency and request ids for the Jam API and MCP server."
+---
+
+Every error has the same JSON body:
+
+```json
+{
+  "error": "Invalid request: limit must be at most 100.",
+  "code": "invalid_request",
+  "requestId": "6f1c2e0a-...",
+  "docs": "https://docs.spreadjam.com/api-reference/errors#invalid_request",
+  "details": [
+    { "field": "limit", "in": "query", "message": "Too big", "maximum": 100, "received": 500 }
+  ]
+}
+```
+
+- `error` is a sentence that says what to change.
+- `code` is stable. Branch on it, not on `error`. New codes may be added; none is renamed.
+- `requestId` matches the `X-Request-Id` response header. Quote it to support. You can send your own `X-Request-Id`.
+- `details` appears on validation errors, one entry per field, with what is accepted (`allowed`, `minimum`, `maximum`, `expected`).
+
+Over MCP, an error comes back as a tool result with `isError: true` and this body as its text.
+
+## Codes
+
+| Code | Status | What to do |
+| --- | --- | --- |
+| <a id="invalid_request" />`invalid_request` | 400 | Fix the fields named in `details`. |
+| <a id="body_required" />`body_required` | 400 | Send a JSON body with `Content-Type: application/json` (`{}` when every field is optional). |
+| <a id="malformed_json" />`malformed_json` | 400 | The body is not valid JSON. |
+| <a id="unsupported_media_type" />`unsupported_media_type` | 415 | Send the body as JSON. |
+| <a id="unauthorized" />`unauthorized` | 401 | Send `Authorization: Bearer sk_...` with a live key. The message says what was wrong. |
+| <a id="forbidden" />`forbidden` | 403 | The key may not do this. |
+| <a id="forbidden_for_api_key" />`forbidden_for_api_key` | 403 | A person has to do this in the dashboard (for example creating API keys). |
+| <a id="plan_required" />`plan_required` | 402, 403 | The workspace needs a paid plan or a plan feature it lacks. |
+| <a id="plan_inactive" />`plan_inactive` | 402 | The plan ended. Reads work; writes wait until the plan is resumed in the dashboard. |
+| <a id="insufficient_credits" />`insufficient_credits` | 402 | Not enough credits. Check `GET /v1/credits`; add credits or wait for the reset. |
+| <a id="payment_required" />`payment_required` | 402 | Another payment step is missing. |
+| <a id="not_found" />`not_found` | 404 | No such resource in this workspace, or no such route. API paths start with `/v1`. |
+| <a id="method_not_allowed" />`method_not_allowed` | 405 | The path exists with other methods, listed in the `Allow` header. |
+| <a id="conflict" />`conflict` | 409 | The resource's state does not allow this yet (for example a scan is already running). Change the state or retry later. |
+| <a id="unprocessable" />`unprocessable` | 422 | The resource can never accept this request as sent. |
+| <a id="idempotency_key_reused" />`idempotency_key_reused` | 422 | The `Idempotency-Key` was used for a different request. Use a new key. |
+| <a id="rate_limited" />`rate_limited` | 429 | Wait `Retry-After` seconds, then retry. |
+| <a id="too_many_concurrent" />`too_many_concurrent` | 429 | Too many slow reads in flight for this key. Wait for one to finish. |
+| <a id="upstream_failed" />`upstream_failed` | 502 | A downstream system did not take the work; nothing was written. Retry later. |
+| <a id="internal_error" />`internal_error` | 500 | Unexpected. Retry once, then email support with the `requestId`. |
+
+## Rate limits
+
+Limits are per API key.
+
+| Requests | Sustained | Burst |
+| --- | --- | --- |
+| Reads (`GET`, `HEAD`) | 10 per second | 30 |
+| Writes (`POST`, `PUT`, `PATCH`, `DELETE`) | 2 per second | 10 |
+
+Every response with a key carries `X-RateLimit-Limit`, `X-RateLimit-Remaining` and `X-RateLimit-Reset` (seconds until the bucket is full). Over the limit you get `429 rate_limited` with `Retry-After` in seconds.
+
+At most 4 of these slow reads run at once per key: `GET /v1/analytics/overview`, `/v1/analytics/prompts`, `/v1/analytics/metrics`, `/v1/keywords` and `/v1/opportunities/{id}/brief`. The fifth gets `429 too_many_concurrent` with `Retry-After: 2`.
+
+Agent connect has no key, so it is limited per IP address: 10 new sessions per 10 minutes, and 120 polls per minute.
+
+## Idempotency
+
+Send `Idempotency-Key: <any string, 1 to 255 characters>` on a write you might retry. It is honoured on `POST /v1/prompts`, `/v1/prompts/bulk`, `/v1/visibility-runs`, `/v1/plan-batches`, `/v1/opportunities/{id}/plan-requests`, `/v1/content` and `/v1/api-keys`.
+
+- The same key with the same request within 24 hours returns the first response again, with `Idempotent-Replayed: true`.
+- Only successful responses are kept, so a failed attempt can be retried with the same key.
+- The same key with a different method, path or body answers `422 idempotency_key_reused`.
+- The same key while the first request is still running answers `409 conflict`. Retry shortly.
+
+Treat it as protection against double submits, not a permanent record: a replay is not guaranteed across a deploy.
+
+## Support
+
+Email jia@spreadjam.com or mal@spreadjam.com with the `requestId`.

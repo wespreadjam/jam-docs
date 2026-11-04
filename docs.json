@@ -48,7 +48,17 @@
         "tab": "Documentation",
         "groups": [
           {
-            "group": "Getting Started",
+            "group": "GEO for agents",
+            "pages": [
+              "agents/quickstart",
+              "agents/concepts",
+              "agents/operating-guide",
+              "api-reference/overview",
+              "api-reference/errors"
+            ]
+          },
+          {
+            "group": "jam-nodes: getting started",
             "pages": [
               "index",
               "quickstart"
@@ -82,16 +92,10 @@
             ]
           },
           {
-            "group": "Guides",
+            "group": "jam-nodes: guides",
             "pages": [
               "creating-nodes",
               "mcp"
-            ]
-          },
-          {
-            "group": "Platform API",
-            "pages": [
-              "api-reference/overview"
             ]
           }
         ]

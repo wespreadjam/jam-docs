@@ -14,6 +14,11 @@
 - The spec is derived from the app's route schemas; to change the reference, change the API in the Jam app repo and ship it. The docs pick up the new surface on the next Mintlify build.
 - `api-reference/overview.mdx` is the hand-written getting-started page (auth, keys); edit it freely. Per-endpoint pages come from the spec, so do not hand-write them.
 
+## GEO for agents
+
+- `agents/*` and `api-reference/errors.mdx` document using the Jam product from an agent (REST, MCP at `https://api.spreadjam.com/mcp`, agent connect). The errors page has one anchor per error `code`; the API links to `api-reference/errors#<code>`, so keep the anchors in step with `API_ERROR_CODES` in the app repo.
+- Copy rules: no em dashes, never the word "generated" (use "created").
+
 ## Terminology
 
 - Use "Jam" to refer to the product

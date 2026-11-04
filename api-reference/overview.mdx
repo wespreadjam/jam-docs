@@ -9,7 +9,9 @@ The Jam Platform API lets you read your AI-visibility data and manage your track
 
 1. Open your Jam workspace and go to **Settings**, then **Developer**.
 2. Click **Create API key** and give it a name.
-3. Copy the key. It is shown once. Test keys begin with `sk_test_` and are available on every plan. Live keys require a paid plan.
+3. Copy the key. It is shown once. Keys look like `sk_` followed by 64 hex characters and reach the workspace's real data; there are no test keys.
+
+An agent can also get a key for a human with one link: see [agent connect](/agents/quickstart#1-get-an-api-key).
 
 <Note>
   Keys are scoped to the workspace that created them. Revoking a key takes effect immediately.
@@ -27,12 +29,12 @@ Send your key as a bearer token on every request:
 Authorization: Bearer $JAM_API_KEY
 ```
 
-A missing or invalid key returns `401`. Every error uses the same shape, `{ "error": string }`, with the status carrying the meaning.
+A missing or invalid key returns `401`. Every error uses the same body, with a stable `code` and a `requestId`: see [Errors and limits](/api-reference/errors).
 
 ## Try it
 
 ```bash
-export JAM_API_KEY=sk_test_your_key_here
+export JAM_API_KEY=sk_your_key_here
 
 # Confirm your key and see which workspace it resolves to.
 curl -sS https://api.spreadjam.com/v1/me \
@@ -44,6 +46,14 @@ curl -sS https://api.spreadjam.com/v1/me \
 Browse the full, always-current reference in the **API Reference** tab. It covers your identity (`/v1/me`), AI-visibility analytics, keyword and topic rankings, your brand profile and competitors, and tracked prompts, each with parameters, response schemas, and a request builder. The machine-readable spec is served at [`https://api.spreadjam.com/openapi.json`](https://api.spreadjam.com/openapi.json).
 
 ## Use with Claude
+
+The fastest way is the Jam MCP server, which exposes every endpoint as a tool:
+
+```bash
+claude mcp add --transport http jam https://api.spreadjam.com/mcp --header "Authorization: Bearer $JAM_API_KEY"
+```
+
+See [Quickstart for agents](/agents/quickstart) for Cursor and other clients. You can also use plain HTTP:
 
 The responses are structured so an agent can act on them directly. Run `claude` in a shell that already has `JAM_API_KEY` exported, then ask it to call an endpoint:
 

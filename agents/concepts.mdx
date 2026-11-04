@@ -1,0 +1,62 @@
+---
+title: "Concepts"
+description: "The nouns of Jam's GEO API: workspaces, projects, prompts, scans, answers, the Plan, research and credits."
+---
+
+## Workspace and key
+
+An API key belongs to one workspace. Possession of the key is access to that workspace: everything the key reads or changes is scoped to it. `GET /v1/me` names the workspace and the person who created the key.
+
+## Project
+
+A project is one website Jam tracks, with its brand, competitors and prompts. A workspace usually has one. Requests act on the newest active project unless you send `X-Jam-Project: <projectId>`.
+
+## Prompts
+
+A prompt is a question a buyer asks an AI assistant, like "best invoicing tool for freelancers". Jam asks each tracked prompt on every platform on every scan. Your plan sets how many prompts you can track; `GET /v1/prompts/cap` shows the cap and how much room is left. Add, edit, pause, replace and remove prompts under `/v1/prompts`, or ask Jam to suggest more with `POST /v1/prompts/suggestions`.
+
+## Scans (visibility runs)
+
+A scan asks every tracked prompt on every platform the plan covers: ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot. Scans run on the plan's cadence (daily, every other day or weekly). `POST /v1/visibility-runs` starts one now; it answers `202` with a `runId` and the expected minutes, or `409` while a scan is already running.
+
+## Answers
+
+Each scan stores the AI answer for every prompt and platform: whether your brand was mentioned or recommended, its position, the brands mentioned in order, and the URLs cited. `GET /v1/answers` lists them newest first; `GET /v1/prompts/{promptId}/answers` is one prompt's history.
+
+## Analytics
+
+The numbers on the dashboard: visibility score, mentions, citation share (a 0 to 100 percentage) and how they moved. `GET /v1/analytics/overview` for the summary, `/v1/analytics/prompts` per prompt, `/v1/analytics/metrics` for platforms, competitors, sources and topics.
+
+## Brand and competitors
+
+`GET /v1/brand` is how Jam describes your company and who it compares you with. Change the positioning with `PATCH /v1/brand` and the competitors under `/v1/brand/competitors`.
+
+## Research
+
+Research is what Jam learns about your market from the answers: which pages AI assistants trust, which sources cite competitors, and where your brand is missing. It feeds the Plan and the content opportunities.
+
+## The Plan (actions)
+
+The Plan is the ranked list of actions that should raise your visibility: pages to write or fix, sites to get listed on, people to pitch. `GET /v1/actions` lists them. Each action has a status:
+
+| Status | Meaning |
+| --- | --- |
+| `suggested` | On the Plan, not started. |
+| `in_progress` | Someone started it. |
+| `sent` | Outreach went out; waiting on the third party. |
+| `done` | Reported done (`POST /v1/actions/{actionId}/completion`). |
+| `verified` / `unverified` | Jam checked whether it took effect. |
+| `dismissed` | Taken off the Plan. |
+| `superseded` | Research no longer proposes it. |
+
+## Content opportunities
+
+Opportunities are pages worth writing. `GET /v1/opportunities` lists them and `GET /v1/opportunities/{id}/brief` returns the brief to write from. An agent can claim one, write it, and store the draft with `POST /v1/content`; Jam can also write it for you (`POST /v1/opportunities/{id}/plan-requests`). Publish to a connected GitHub repository with `PUT /v1/content/{id}/destinations/{destinationId}`.
+
+## Credits
+
+Work Jam does for you (writing, research, outreach) costs credits. The plan grants an allowance that resets each period. `GET /v1/credits` shows the balance, allowance, reset time and recent charges. A request that needs more credits than you have answers `402 insufficient_credits`.
+
+## Plan state
+
+When a plan ends the workspace becomes read-only: reads keep working and writes answer `402 plan_inactive` until the plan is resumed in the dashboard.

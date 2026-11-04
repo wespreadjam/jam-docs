@@ -1,0 +1,104 @@
+---
+title: "Quickstart for agents"
+description: "Connect Claude Code, Cursor or any agent to Jam: get a key, add the MCP server, make your first five calls."
+---
+
+Jam tracks how AI assistants answer the questions your buyers ask, and turns the gaps into a Plan of actions. Everything a customer does in the dashboard is available to an agent through the REST API at `https://api.spreadjam.com/v1` and the MCP server at `https://api.spreadjam.com/mcp`.
+
+Jam scans ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot.
+
+## 1. Get an API key
+
+<Tabs>
+  <Tab title="From an agent (agent connect)">
+    The agent starts a session. No key is needed for this call.
+
+    ```bash
+    curl -sS -X POST https://api.spreadjam.com/v1/agent-connect \
+      -H "Content-Type: application/json" \
+      -d '{"domain": "acme.com", "agentName": "Claude Code"}'
+    ```
+
+    ```json
+    {
+      "connectUrl": "https://www.spreadjam.com/connect/ABCD234567",
+      "pollToken": "jcp_...",
+      "expiresAt": "2026-11-04T12:00:00.000Z",
+      "intervalSeconds": 5
+    }
+    ```
+
+    Give the human the `connectUrl`. They sign up or sign in, set up their site (the domain you sent is filled in), choose a plan, and approve. If they already use Jam, they only approve.
+
+    Keep the `pollToken` secret, and poll every `intervalSeconds`:
+
+    ```bash
+    curl -sS https://api.spreadjam.com/v1/agent-connect/$POLL_TOKEN
+    ```
+
+    | `status` | Meaning |
+    | --- | --- |
+    | `pending` | The human has not approved yet. Poll again. |
+    | `approved` | The response carries `apiKey` and `workspaceId`. This is the only time the key is shown: store it now. |
+    | `consumed` | The key was already handed out. Start a new session if it was lost. |
+    | `denied` | The human declined. |
+    | `expired` | Nobody approved within two hours. Start a new session. |
+
+    Starting sessions is limited to 10 per IP address every 10 minutes.
+  </Tab>
+  <Tab title="From the dashboard">
+    1. Open Jam and go to **Settings**, then **Developer**.
+    2. Click **Create API key** and give it a name.
+    3. Copy the key. It is shown once.
+  </Tab>
+</Tabs>
+
+Keys look like `sk_` followed by 64 hex characters. A key reaches its workspace's real data; there are no test keys. Revoke a key in **Settings**, **Developer**.
+
+## 2. Connect over MCP
+
+The MCP server exposes every API route as a tool, named by its operation id (`get_me`, `list_prompts`, `list_actions`, ...). It uses the same key.
+
+<CodeGroup>
+```bash Claude Code
+claude mcp add --transport http jam https://api.spreadjam.com/mcp \
+  --header "Authorization: Bearer $JAM_API_KEY"
+```
+
+```json Cursor (.cursor/mcp.json)
+{
+  "mcpServers": {
+    "jam": {
+      "url": "https://api.spreadjam.com/mcp",
+      "headers": { "Authorization": "Bearer sk_..." }
+    }
+  }
+}
+```
+</CodeGroup>
+
+To work on a project other than your newest one, also send `X-Jam-Project: <projectId>`.
+
+Prefer plain HTTP? Use the [OpenAPI spec](https://api.spreadjam.com/openapi.json) and send `Authorization: Bearer $JAM_API_KEY` on every request.
+
+## 3. Your first five calls
+
+```bash
+export JAM=https://api.spreadjam.com/v1
+auth=(-H "Authorization: Bearer $JAM_API_KEY")
+
+curl -sS "${auth[@]}" $JAM/me                  # which workspace this key is for
+curl -sS "${auth[@]}" $JAM/analytics/overview  # visibility, mentions, citations
+curl -sS "${auth[@]}" $JAM/prompts             # what is tracked
+curl -sS "${auth[@]}" $JAM/actions             # the Plan: what to do next
+curl -sS "${auth[@]}" $JAM/credits             # credits left and when they reset
+```
+
+Over MCP these are `get_me`, `get_analytics_overview`, `list_prompts`, `list_actions` and `get_credits`.
+
+## Next
+
+- [Concepts](/agents/concepts): projects, prompts, scans, answers, the Plan, research and credits.
+- [How to operate Jam](/agents/operating-guide): a page to paste into your agent's context.
+- [Errors and limits](/api-reference/errors): error codes, rate limits and idempotency.
+- Help: email jia@spreadjam.com or mal@spreadjam.com, and quote the `requestId` from the error.
