@@ -80,7 +80,7 @@ A draft's text is at `currentRevision.article.bodyMarkdown` on `GET /v1/content/
 Work Jam does for you (writing, research, outreach) costs credits. The plan grants an allowance that resets each period. `GET /v1/credits` shows the balance, allowance, reset time and recent charges; each charge has a plain `description` and `spend: false` when it is bookkeeping rather than work. A new account's first row is a `geo_allowance_expiry`: the free allowance replaced by the plan's credits, not a spend. A request that needs more credits than you have answers `402 insufficient_credits`.
 
 <Note>
-When a project's first research run finishes, Jam drafts the top 3 new pages on the Plan by itself, once per project, paid from the plan's included credits. Those actions go `in_progress` with actor `jam`, and `llm_query` charges appear in `recentCharges` without a request from you. The drafts stay in Jam until someone publishes them; nothing is sent to your site. Later research runs draft nothing on their own: more drafts wait for a request (`POST /v1/plan-batches` or a single action).
+When a project's first research run finishes, Jam drafts up to 3 new pages (the highest-ranked `new_page` actions) by itself, once per project, paid from the plan's included credits. They are written one after another, about 5 minutes each, so the third can show as queued for a while. Those actions go `in_progress` with actor `jam`, and `llm_query` charges appear in `recentCharges` without a request from you. The drafts stay in Jam until someone publishes them; nothing is sent to your site. Later research runs draft nothing on their own: more drafts wait for a request (`POST /v1/plan-batches` or a single action).
 </Note>
 
 ## Plan state and billing
@@ -102,3 +102,12 @@ Older fields stay for clients that already read them: `/v1/answers` also has `ne
 ## Webhooks and notifications
 
 Jam can POST its notifications (plan ready, PR opened, scan failed, ...) to your own URL. Manage the URLs with `/v1/webhooks` and choose which notifications go there with `/v1/notification-rules`. See [Webhooks](/agents/webhooks).
+
+
+## Scored and unscored questions
+
+A question that names your brand (by name, alias, domain or domain label, for example "spreadjam reviews") or names a tracked competitor ("X vs Y", "X alternatives") is tracked and its answers are kept, but it does not count toward visibility, mentions or citation share. Those rates only use questions a buyer asks without naming a vendor. `GET /v1/prompts` returns `branded`, `scored` and `unscoredReason` for each question, and `POST /v1/agent-connect` returns `warnings` for sent questions that will be unscored.
+
+## Name collisions
+
+If another product shares your brand name (Jam and jam.dev), an answer about the other product does not count as a mention of yours. The brand profile has a `notConfusedWith` list (set it in `onboarding.notConfusedWith` or with `PATCH /v1/brand`); research adds to it when answers cite a same-named product on another domain.
