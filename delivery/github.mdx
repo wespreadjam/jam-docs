@@ -1,0 +1,54 @@
+---
+title: "GitHub"
+description: "Connect your site's repository so Jam opens a pull request for each page and change. You review and merge."
+---
+
+## Connect a repository
+
+<Steps>
+  <Step title="Connect GitHub">
+    On the Plan, choose **Connect GitHub**, or open **Settings** and the delivery methods. Jam asks you to install its GitHub App on the account or organisation that owns your site's repository.
+  </Step>
+  <Step title="Choose where articles go">
+    | Field | What it is | Example |
+    | --- | --- | --- |
+    | Repository | Your site's repository. | `acme/website` |
+    | Base branch | The branch pull requests target. | `main` |
+    | Content folder | The folder your articles live in. | `content/blog` |
+    | Public route | The address an article is published at, with `{slug}` where its slug goes. | `https://acme.com/blog/{slug}` |
+
+    Jam checks the repository, branch and folder, and detects how your existing articles are written, so new ones match.
+
+  </Step>
+  <Step title="Check the connection">
+    The delivery method shows **Connected** when the last check was fine. Use **Check connection** after changing access on GitHub.
+  </Step>
+</Steps>
+
+## Ship a page
+
+When a draft is ready, **Make PR** opens a pull request with the page on your base branch. Over the API, `publish_content` publishes the current revision to the destination now (`{"when": "now"}`) or at a time (`{"publishAt": "2026-12-01T09:00:00Z"}`). It also retries a failed attempt.
+
+`list_content_deliveries` lists each attempt with its `state` and `prUrl`. Merging the pull request is up to you; the page goes live when your site deploys.
+
+## Ship a change
+
+A `page_edit` or `technical` action gets a prepared code change. Preview it on the action's page, then **Make PR**, or `create_site_change_pull_request` over the API. It holds 20 credits, kept only if the pull request opens, and the change moves to `in_review` with its `prUrl`.
+
+## Publish on a schedule
+
+A destination can publish drafted content by itself: `update_destination` with `autoPublish: true` and a `cadence` of `daily` or `weekly`. Turning it on for one destination turns it off for the project's others.
+
+## Withdraw
+
+Cancelling publishing on an item that has an open pull request also withdraws it there. Over the API that is `cancel_content_publishing` with `withdraw=true`; without it, the call answers `409` so nothing is withdrawn by accident.
+
+## Set it up from the API
+
+| Step                     | Tool                                                                                                   |
+| ------------------------ | ------------------------------------------------------------------------------------------------------ |
+| Add a GitHub destination | `create_destination` with `{"platform": "github"}`                                                     |
+| Point it at a repository | `configure_destination_github` with `owner`, `name`, `baseBranch`, `contentRoot`, `publicRoutePattern` |
+| List destinations        | `list_destinations`                                                                                    |
+
+The GitHub App itself is installed from the dashboard.

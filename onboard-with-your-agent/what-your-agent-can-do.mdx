@@ -1,0 +1,64 @@
+---
+title: "What your agent can do"
+description: "Once connected, your agent can read where you stand, work the Plan, run research and ship pages, with the same tools as the dashboard."
+---
+
+The MCP server has one tool per API route, named by its operation id. A connected agent can do what you can do in the dashboard with your role, except create API keys.
+
+## Read where you stand
+
+| Ask                                         | Tools                                                                       |
+| ------------------------------------------- | --------------------------------------------------------------------------- |
+| Which workspace and site is this?           | `get_me`, `list_projects`                                                   |
+| How visible are we?                         | `get_analytics_overview`, `list_prompt_analytics`, `list_analytics_metrics` |
+| What do the AI assistants actually say?     | `list_answers`, `list_prompt_answers`                                       |
+| What is tracked, and how much room is left? | `list_prompts` (send `limit`), `get_prompt_cap`                             |
+| Who are we compared with?                   | `get_brand`                                                                 |
+| How many credits are left?                  | `get_credits`                                                               |
+
+## Read the Plan
+
+`list_actions` returns the Plan, best first, with counts per status. `get_action` returns everything needed to do one action: its evidence, the prompts it should move, the target page, the change Jam prepared (if any) and `agentPrompt`, instructions your agent can follow, ending with how to report the work done. See [The Plan](/actions/the-plan).
+
+## Run research
+
+`get_research` says whether research is running and whether another run would be accepted. `get_research_report` returns what the latest run found. `create_research_request` asks Jam to research again and rewrite the Plan: the first run is free, each later one holds 500 credits, kept only if it succeeds. It takes about ten minutes. See [Research](/research/overview).
+
+`create_visibility_run` asks every prompt again now. Scans use no credits; it answers `409` while a scan is already running.
+
+## Ship work
+
+An agent can do an action three ways:
+
+- **Have Jam do it.** `create_action_execution` drafts a new page, or prepares a code change for a page edit or technical fix. With `{"mode": "agent"}` it starts the same background run as the dashboard's **Send to Jam**.
+- **Do it itself.** Follow the action's `agentPrompt`. For a new page: read the brief (`get_opportunity_brief`), claim it (`claim_opportunity`), write it, and store the draft (`create_content`).
+- **Ship it.** Open the pull request for a prepared change (`create_site_change_pull_request`, 20 credits, kept only if it opens), or publish a draft to your connected repository (`publish_content`).
+
+Then it reports the work with `complete_action` and the URL of what changed. Jam checks the page and marks the action `verified` or `unverified`. See [Doing the work](/actions/doing-the-work) and [Delivery](/delivery/overview).
+
+## Manage what is tracked
+
+Add, reword, pause, replace or remove prompts (`add_prompt`, `add_prompts_bulk`, `edit_prompt`, `pause_prompt`, `replace_prompt`, `remove_prompt`), ask Jam for more (`suggest_prompts`), and edit the brand and competitors (`update_brand`, `add_brand_competitors`, `remove_brand_competitor`).
+
+## Get told when things happen
+
+Send Jam's notifications to your own URL with `create_webhook`, and choose which ones with `update_notification_rule`. See [Webhooks](/api-reference/webhooks).
+
+## How tools are marked
+
+- Reads are `readOnlyHint: true`.
+- Tools that spend credits, publish to your site or repository, or delete something are `destructiveHint: true`. A tool that spends credits says what it costs at the start of its description.
+- Tools that are safe to repeat are `idempotentHint: true`.
+
+Set your client to approve reads on its own and ask before the rest. Writes need an active plan; when a plan ends the workspace becomes read only and writes answer `402`.
+
+## A first conversation
+
+```text
+You: How are we doing in AI search, and what should we do first?
+
+Agent: get_me, get_analytics_overview, list_actions
+       "You are mentioned in 18% of answers, behind Harvest at 41%. The top action
+        is a comparison page for 'Harvest alternatives for agencies'. Jam can draft
+        it (about 45 credits), or I can write it from the brief. Which do you want?"
+```

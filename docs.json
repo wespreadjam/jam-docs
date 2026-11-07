@@ -2,166 +2,150 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Jam",
+  "description": "Jam shows where AI assistants recommend you, works out what to change, and ships the work. Use it from the dashboard or from your own agent over MCP and the API.",
   "colors": {
-    "primary": "#171717",
-    "light": "#fafafa",
-    "dark": "#171717"
+    "primary": "#fa114e",
+    "light": "#ff8391",
+    "dark": "#fa114e"
+  },
+  "background": {
+    "color": {
+      "light": "#f1f1f1",
+      "dark": "#1c1b24"
+    }
+  },
+  "fonts": {
+    "family": "Geist",
+    "heading": {
+      "family": "Geist",
+      "weight": 500
+    },
+    "body": {
+      "family": "Geist",
+      "weight": 400
+    }
   },
   "styling": {
+    "eyebrows": "section",
     "codeblocks": {
-      "themes": {
+      "theme": {
         "light": "github-light",
         "dark": "github-dark-dimmed"
       }
     }
   },
-  "background": {
-    "color": {
-      "light": "#FAF9F5",
-      "dark": "#1c1c1c"
-    }
+  "appearance": {
+    "default": "system"
   },
-  "metadata": {
-    "og:image": "/images/og-image.png",
-    "og:site_name": "Jam Docs",
-    "og:description": "Jam for agents: track how AI assistants answer your buyers, and carry out the Plan over MCP or the REST API."
+  "rounded": "sharp",
+  "icons": {
+    "library": "lucide"
   },
   "favicon": "/favicon.svg",
-  "fonts": {
-    "family": "Inter",
-    "heading": {
-      "family": "Inter",
-      "weight": 300
-    },
-    "body": {
-      "family": "Inter",
-      "weight": 400
-    }
-  },
-  "appearance": {
-    "default": "light"
-  },
-  "rounded": "default",
-  "navigation": {
-    "tabs": [
-      {
-        "tab": "GEO for agents",
-        "groups": [
-          {
-            "group": "GEO for agents",
-            "pages": [
-              "index",
-              "agents/quickstart",
-              "agents/concepts",
-              "agents/operating-guide",
-              "agents/webhooks"
-            ]
-          },
-          {
-            "group": "API",
-            "pages": [
-              "api-reference/overview",
-              "api-reference/errors"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "openapi": "https://api.spreadjam.com/openapi.json"
-      },
-      {
-        "tab": "jam-nodes (workflow library)",
-        "groups": [
-          {
-            "group": "jam-nodes: getting started",
-            "pages": [
-              "jam-nodes/overview",
-              "quickstart"
-            ]
-          },
-          {
-            "group": "Core",
-            "pages": [
-              "core/types",
-              "core/registry",
-              "core/execution-context",
-              "core/utilities"
-            ]
-          },
-          {
-            "group": "Built-in Nodes",
-            "pages": [
-              "nodes/overview",
-              "nodes/logic",
-              "nodes/transform",
-              "nodes/integration",
-              "nodes/ai"
-            ]
-          },
-          {
-            "group": "Playground",
-            "pages": [
-              "playground/overview",
-              "playground/cli",
-              "playground/web"
-            ]
-          },
-          {
-            "group": "jam-nodes: guides",
-            "pages": [
-              "creating-nodes",
-              "mcp"
-            ]
-          }
-        ]
-      }
-    ],
-    "global": {
-      "anchors": [
-        {
-          "anchor": "Website",
-          "href": "https://www.spreadjam.com"
-        },
-        {
-          "anchor": "Blog",
-          "href": "https://www.spreadjam.com/blogs"
-        },
-        {
-          "anchor": "Open Source",
-          "href": "https://github.com/wespreadjam/jam-nodes"
-        },
-        {
-          "anchor": "Discord",
-          "href": "https://dsc.gg/spreadjam"
-        },
-        {
-          "anchor": "npm",
-          "href": "https://www.npmjs.com/org/jam-nodes"
-        }
-      ]
-    }
-  },
   "logo": {
     "light": "/logo/light.svg",
     "dark": "/logo/dark.svg",
-    "height": 28
+    "href": "https://www.spreadjam.com"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "pages": [
+          "index",
+          "get-started/quickstart",
+          "get-started/concepts"
+        ]
+      },
+      {
+        "group": "Onboard with your agent",
+        "pages": [
+          "onboard-with-your-agent",
+          "onboard-with-your-agent/claude",
+          "onboard-with-your-agent/claude-code",
+          "onboard-with-your-agent/chatgpt",
+          "onboard-with-your-agent/cursor",
+          "onboard-with-your-agent/other-clients",
+          "onboard-with-your-agent/agent-connect",
+          "onboard-with-your-agent/what-your-agent-can-do",
+          "onboard-with-your-agent/copy-prompt",
+          "onboard-with-your-agent/operating-guide"
+        ]
+      },
+      {
+        "group": "Tracking",
+        "pages": [
+          "tracking/overview",
+          "tracking/prompts",
+          "tracking/scans-and-answers"
+        ]
+      },
+      {
+        "group": "Research",
+        "pages": [
+          "research/overview"
+        ]
+      },
+      {
+        "group": "Actions",
+        "pages": [
+          "actions/the-plan",
+          "actions/doing-the-work"
+        ]
+      },
+      {
+        "group": "Delivery",
+        "pages": [
+          "delivery/overview",
+          "delivery/github",
+          "delivery/markdown"
+        ]
+      },
+      {
+        "group": "API and MCP reference",
+        "pages": [
+          "api-reference/overview",
+          "api-reference/mcp",
+          "api-reference/errors",
+          "api-reference/webhooks",
+          {
+            "group": "Endpoints",
+            "expanded": false,
+            "openapi": "https://api.spreadjam.com/openapi.json"
+          }
+        ]
+      },
+      {
+        "group": "Billing",
+        "pages": [
+          "billing/plans-and-credits"
+        ]
+      }
+    ]
   },
   "navbar": {
     "links": [
+      {
+        "label": "Pricing",
+        "href": "https://www.spreadjam.com/pricing"
+      },
       {
         "label": "Blog",
         "href": "https://www.spreadjam.com/blogs"
       },
       {
-        "label": "Pricing",
-        "href": "https://www.spreadjam.com/pricing"
+        "label": "Changelog",
+        "href": "https://www.spreadjam.com/changelog"
+      },
+      {
+        "label": "Log in",
+        "href": "https://www.spreadjam.com/start"
       }
     ],
     "primary": {
       "type": "button",
-      "label": "Get started",
-      "href": "https://www.spreadjam.com"
+      "label": "Start free",
+      "href": "https://www.spreadjam.com/start"
     }
   },
   "contextual": {
@@ -180,12 +164,96 @@
       "github": "https://github.com/wespreadjam",
       "linkedin": "https://www.linkedin.com/company/108739060/",
       "discord": "https://dsc.gg/spreadjam"
-    }
+    },
+    "links": [
+      {
+        "header": "Product",
+        "items": [
+          {
+            "label": "Pricing",
+            "href": "https://www.spreadjam.com/pricing"
+          },
+          {
+            "label": "API playground",
+            "href": "https://www.spreadjam.com/api-playground"
+          },
+          {
+            "label": "Changelog",
+            "href": "https://www.spreadjam.com/changelog"
+          }
+        ]
+      },
+      {
+        "header": "Resources",
+        "items": [
+          {
+            "label": "Blog",
+            "href": "https://www.spreadjam.com/blogs"
+          },
+          {
+            "label": "OpenAPI spec",
+            "href": "https://api.spreadjam.com/openapi.json"
+          },
+          {
+            "label": "Book a call",
+            "href": "https://cal.com/jam-jam/aeo"
+          }
+        ]
+      }
+    ]
   },
   "redirects": [
     {
+      "source": "/agents/quickstart",
+      "destination": "/onboard-with-your-agent"
+    },
+    {
+      "source": "/agents/concepts",
+      "destination": "/get-started/concepts"
+    },
+    {
+      "source": "/agents/operating-guide",
+      "destination": "/onboard-with-your-agent/operating-guide"
+    },
+    {
+      "source": "/agents/webhooks",
+      "destination": "/api-reference/webhooks"
+    },
+    {
+      "source": "/agents",
+      "destination": "/onboard-with-your-agent"
+    },
+    {
+      "source": "/quickstart",
+      "destination": "/get-started/quickstart"
+    },
+    {
+      "source": "/creating-nodes",
+      "destination": "/"
+    },
+    {
       "source": "/jam-nodes",
-      "destination": "/jam-nodes/overview"
+      "destination": "/"
+    },
+    {
+      "source": "/jam-nodes/:slug*",
+      "destination": "/"
+    },
+    {
+      "source": "/core/:slug*",
+      "destination": "/"
+    },
+    {
+      "source": "/nodes/:slug*",
+      "destination": "/"
+    },
+    {
+      "source": "/playground/:slug*",
+      "destination": "/"
+    },
+    {
+      "source": "/api-reference/keywords",
+      "destination": "/api-reference/overview"
     }
   ]
 }

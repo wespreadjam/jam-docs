@@ -1,0 +1,39 @@
+---
+title: "Cursor"
+description: "Add the Jam MCP server to Cursor with an API key."
+---
+
+<Steps>
+  <Step title="Create an API key">
+    In Jam, open **Settings**, **Developer**, **Create API key**, and copy the key. It is shown once.
+  </Step>
+  <Step title="Add the server">
+    Add Jam to `.cursor/mcp.json` in your project, or to `~/.cursor/mcp.json` for every project:
+
+    ```json .cursor/mcp.json
+    {
+      "mcpServers": {
+        "jam": {
+          "url": "https://api.spreadjam.com/mcp",
+          "headers": { "Authorization": "Bearer sk_..." }
+        }
+      }
+    }
+    ```
+
+  </Step>
+  <Step title="Check it works">
+    Open Cursor's MCP settings and check that **jam** is connected and lists its tools. Then ask the agent: "Which Jam workspace are you connected to?"
+  </Step>
+</Steps>
+
+<Warning>
+  A project `.cursor/mcp.json` holding a key should not be committed. Use the
+  file in your home folder, or keep the project file out of version control.
+</Warning>
+
+## Why a key and not sign-in
+
+Jam's sign-in only returns to `https` addresses or to `localhost`. Cursor's sign-in returns to a `cursor://` address, which Jam does not accept today, so use a key.
+
+To work on one site of several, add `"X-Jam-Project": "<projectId>"` to `headers`, or pass `projectId` to a tool.

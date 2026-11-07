@@ -1,41 +1,51 @@
 ---
-title: "Jam for agents"
-description: "Jam tracks how AI assistants answer the questions your buyers ask, and turns the gaps into a Plan your agent can carry out. Connect over MCP or call the REST API."
+title: "Jam docs"
+sidebarTitle: "Introduction"
+description: "Jam shows where AI assistants recommend you, works out what to change, and ships the work. Use it from the dashboard, or from your own agent over MCP and the API."
 ---
 
-Jam does GEO (generative engine optimization): it asks ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot the questions your buyers ask, records every answer, and shows whether your brand is mentioned, recommended and cited. The gaps become a Plan of actions: pages to write or fix, sources to earn, competitors to answer.
-
-Everything a customer does in the Jam dashboard is open to an agent:
-
-- **MCP server** at `https://api.spreadjam.com/mcp`, one tool per API route. Claude.ai, Claude Desktop and ChatGPT sign in with OAuth; other clients send an API key.
-- **REST API** at `https://api.spreadjam.com/v1`, described by the [OpenAPI spec](https://api.spreadjam.com/openapi.json).
-- **Agent connect**: an agent with no key sends its human one link, and gets a key once they approve.
+Jam asks ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot (and Claude, as an add-on) the questions your buyers ask. It records every answer and shows whether your brand is mentioned, recommended and cited. Research turns the gaps into a Plan: pages to write or fix, technical changes, sources to earn. Jam can do the work and ship it to your site, or hand it to your own agent.
 
 <CardGroup cols={2}>
-  <Card title="Quickstart for agents" href="/agents/quickstart">
-    Get a key or sign in, connect the MCP server, make your first five calls.
+  <Card title="Quickstart" href="/get-started/quickstart">
+    Set up your site in the dashboard and read your first results.
   </Card>
-  <Card title="Concepts" href="/agents/concepts">
-    Projects, prompts, scans, answers, the Plan, research, credits and paging.
-  </Card>
-  <Card title="How to operate Jam" href="/agents/operating-guide">
-    A page to paste into your agent's context so it uses Jam well.
-  </Card>
-  <Card title="Errors and limits" href="/api-reference/errors">
-    Error codes, rate limits and idempotency.
+  <Card title="Onboard with your agent" href="/onboard-with-your-agent">
+    Connect Claude, Claude Code, ChatGPT, Cursor or any MCP client.
   </Card>
 </CardGroup>
 
-## What an agent can do
+## How Jam works
 
-- Read visibility: the overview, per-prompt numbers, the brand leaderboard, platform health and the raw AI answers.
-- Manage what is tracked: add, reword, pause or remove prompts, and edit the brand and its competitors.
-- Work the Plan: list actions, start them, draft content, open pull requests on your site, and mark them done.
-- Run scans and research when the numbers need refreshing.
-- Get notified: send Jam's notifications to your own URL with [webhooks](/agents/webhooks).
+<Steps>
+  <Step title="Tracking">
+    Jam asks every [tracked prompt](/tracking/prompts) on every platform your
+    plan covers, on your plan's cadence, and keeps each answer. See
+    [Tracking](/tracking/overview).
+  </Step>
+  <Step title="Research">
+    Jam reads the answers to learn which pages AI assistants trust, which
+    sources cite your competitors and where you are missing. See
+    [Research](/research/overview).
+  </Step>
+  <Step title="Actions">
+    Research becomes the Plan: a ranked list of actions, each with its evidence.
+    Send one to Jam, copy its prompt into your own agent, or do it yourself. See
+    [The Plan](/actions/the-plan).
+  </Step>
+  <Step title="Delivery">
+    Finished pages reach your site as a pull request on GitHub, or as Markdown
+    you publish yourself. See [Delivery](/delivery/overview).
+  </Step>
+</Steps>
 
-Work that writes or opens pull requests spends credits. Every tool that does says so at the start of its description, and `GET /v1/credits` shows the balance.
+## Two ways to work
 
-## Looking for jam-nodes?
+- **The dashboard** at [spreadjam.com](https://www.spreadjam.com/start). Everything in these docs has a button there.
+- **Your own agent.** The [MCP server](/api-reference/mcp) at `https://api.spreadjam.com/mcp` and the [REST API](/api-reference/overview) at `https://api.spreadjam.com/v1` expose everything the dashboard does. Claude and ChatGPT sign in with OAuth; other clients send an API key.
 
-The open-source workflow node framework has moved to [jam-nodes](/jam-nodes/overview).
+<Note>
+  Work that writes pages, opens pull requests or runs research again spends
+  credits. Scans of your tracked prompts do not. See [Plans and
+  credits](/billing/plans-and-credits).
+</Note>

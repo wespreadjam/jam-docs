@@ -1,0 +1,50 @@
+---
+title: "Tracking"
+sidebarTitle: "Overview"
+description: "Jam asks AI assistants the questions your buyers ask, on a schedule, and shows where you are mentioned, recommended and cited."
+---
+
+Tracking is the base of everything else in Jam. You choose the questions (prompts); Jam asks each one on every platform your plan covers, on your plan's cadence, and keeps every answer.
+
+## Platforms
+
+| Platform            | API value            |
+| ------------------- | -------------------- |
+| ChatGPT             | `chatgpt`            |
+| Gemini              | `gemini`             |
+| Perplexity          | `perplexity`         |
+| Google AI Mode      | `google_ai_mode`     |
+| Google AI Overviews | `google_ai_overview` |
+| Microsoft Copilot   | `copilot`            |
+| Claude (add-on)     | `claude`             |
+
+Claude is off by default. Each Claude answer is asked through Anthropic with web search and costs far more than one on any other platform, so it is priced as an add-on. See [Plans and credits](/billing/plans-and-credits).
+
+## Cadence
+
+Scans run weekly, every other day or daily, as your plan sets. You can also start one now (`create_visibility_run`). Scans use no credits.
+
+## What Jam measures
+
+| Measure                      | Meaning                                                          |
+| ---------------------------- | ---------------------------------------------------------------- |
+| Visibility score             | How often and how prominently you appear in answers, 0 to 100.   |
+| Mentions                     | Answers that name your brand.                                    |
+| Recommendations and position | Whether an answer recommends you, and where you sit in its list. |
+| Citation share               | Your share of the citations in answers, 0 to 100.                |
+| Sources                      | Which sites the answers cite, with your own site marked.         |
+
+Each measure is also shown for your competitors, so you see who is recommended instead of you. Read them with `get_analytics_overview`, `list_prompt_analytics` and `list_analytics_metrics`.
+
+## Scored and unscored questions
+
+A prompt that names your brand ("Acme reviews") or a tracked competitor ("Harvest vs FreshBooks", "Harvest alternatives") is tracked and its answers are kept, but it does not count toward visibility, mentions or citation share. Those numbers only use questions a buyer asks without naming a vendor, so they show whether AI assistants find you on their own.
+
+## Name collisions
+
+If another product shares your name, an answer about it does not count as a mention of yours. The brand profile has a `notConfusedWith` list for this; research adds to it when answers cite a same-named product on another domain.
+
+## Next
+
+- [Prompts](/tracking/prompts): choosing, editing and adding questions.
+- [Scans and answers](/tracking/scans-and-answers): how a scan runs and what each answer records.

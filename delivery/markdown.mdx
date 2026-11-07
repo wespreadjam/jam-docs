@@ -1,0 +1,42 @@
+---
+title: "Markdown"
+description: "Get each article as Markdown to publish yourself, or hand it to your coding agent to add to your site."
+---
+
+With Markdown delivery, Jam writes and stores the article and you publish it. Choose **Use Markdown** on the Plan, or switch in **Settings**.
+
+## Get the article
+
+Open a drafted article and use:
+
+- **Download Markdown**: a `.md` file of the current revision.
+- **Copy Markdown**: the same text on your clipboard.
+- **Copy prompt**: instructions for your coding agent to add the page to your site.
+
+Over the API, the text is at `currentRevision.article.bodyMarkdown` on `get_content` (`GET /v1/content/{contentId}`). The list view (`list_content`) carries the title and state, not the body.
+
+## Tell Jam where it is live
+
+After you publish, record the URL with **Mark published**, or `mark_content_published` with `{"url": "https://acme.com/blog/..."}`. The page then shows as live.
+
+## Write it with your own agent
+
+Your agent can write the article instead of Jam:
+
+<Steps>
+  <Step title="Read the brief">
+    `get_opportunity_brief`. The first read plans the article and can take 30 to
+    60 seconds; it is included in the plan.
+  </Step>
+  <Step title="Claim it">
+    `claim_opportunity`, so Jam and other agents do not write it at the same
+    time. It answers `409` when someone else holds it.
+  </Step>
+  <Step title="Store the draft">
+    `create_content` with the article: `title`, `metaDescription`, `slug`, `keywords` and `bodyMarkdown`. This releases the claim. If
+    the agent cannot finish, `report_opportunity_agent_failure` with a reason,
+    or `release_opportunity_claim`.
+  </Step>
+</Steps>
+
+The draft then follows the same delivery as one Jam wrote.

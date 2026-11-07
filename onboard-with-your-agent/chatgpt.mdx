@@ -1,0 +1,38 @@
+---
+title: "ChatGPT"
+description: "Connect Jam to ChatGPT as a custom connector with OAuth sign-in."
+---
+
+<Steps>
+  <Step title="Turn on developer mode">
+    Custom connectors need ChatGPT's developer mode. Turn it on in ChatGPT's settings, under connectors.
+  </Step>
+  <Step title="Add the connector">
+    Create a connector with:
+
+    | Field | Value |
+    | --- | --- |
+    | URL | `https://api.spreadjam.com/mcp` |
+    | Authentication | OAuth |
+
+  </Step>
+  <Step title="Sign in to Jam">
+    ChatGPT opens a Jam page. Sign in (or sign up and choose a plan), check the workspace and where you will be sent back to, and approve.
+  </Step>
+</Steps>
+
+ChatGPT registers itself with Jam on the first sign-in, so there is no client id or secret to enter.
+
+## Check it works
+
+In a new chat with the connector on, ask: "Use Jam: which workspace are you connected to, and what is our visibility score?"
+
+## Disconnect
+
+The connection appears in Jam under **Settings**, **Developer** as a key named after the client. Revoke it there.
+
+<Note>
+  ChatGPT's menus for connectors change often and differ by plan. If the steps
+  above do not match what you see, the two values that matter are the URL and
+  OAuth authentication.
+</Note>

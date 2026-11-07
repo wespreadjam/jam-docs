@@ -1,0 +1,47 @@
+---
+title: "Plans and credits"
+description: "How Jam's plan is priced, what work credits buy, the free trial, and what happens when a plan ends."
+---
+
+## The plan
+
+You build one plan from four choices. The price page and `get_pricing` (`GET /v1/pricing`, no key needed) show the monthly price of every combination.
+
+| Choice          | Options                                                                                                                   |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| Prompt capacity | 50 to 1,000 prompts, in steps of 50.                                                                                      |
+| Scan cadence    | Weekly, every other day, or daily.                                                                                        |
+| Platforms       | ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and Microsoft Copilot are included. Claude is an add-on. |
+| Work credits    | 1,000, 2,000, 5,000 or 10,000 a month.                                                                                    |
+
+Send `promptCapacity`, `cadence`, `platforms` or `workCredits` to `get_pricing` for a quote on one combination.
+
+## Free trial
+
+An account that has never had a Jam subscription gets a 14-day free trial. Checkout asks for a card, and the first charge is at the end of the trial. An account that had a subscription before is charged at checkout.
+
+## What credits buy
+
+Scans are covered by the plan and use no credits. Work Jam does for you spends credits from the monthly allowance:
+
+| Work                  | Credits                                                                                                                                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Draft a new page      | Metered: what its writing actually cost. About 45 for a one-shot draft, about 65 when Jam researches and writes it as an agent. Nothing is charged when no page is saved. |
+| Open a pull request   | 20, kept only if the pull request opens.                                                                                                                                  |
+| Research again        | 500, kept only if the run succeeds. The first run is free.                                                                                                                |
+| Read an article brief | Included.                                                                                                                                                                 |
+| Visibility scans      | Included.                                                                                                                                                                 |
+
+These are the figures `get_pricing` returns in `creditCosts`; read it for the current numbers. A tool that spends credits says what it costs at the start of its description.
+
+When the first research run finishes, Jam drafts up to three of the top new pages by itself, once per project, from the plan's credits.
+
+## Your balance
+
+`get_credits` (`GET /v1/credits`) shows the balance, the allowance, when it resets, and recent charges. Each charge has a plain `description`, and `spend: false` when it is bookkeeping rather than work. A request that needs more credits than you have answers `402 insufficient_credits`. Buy more credits, or turn on top-up, in **Settings**, **Billing**.
+
+## When a plan ends
+
+The workspace becomes read only: reads keep working, and writes answer `402 plan_inactive` until the plan is resumed. Every `402` carries `resolveUrl`, the dashboard page where a person fixes it.
+
+`get_billing` returns the plan state, whether the key's owner can manage billing (`canManage`, workspace owners only), and links to manage billing, resume the plan, buy credits and change the plan. The API never charges a card or opens a checkout itself: a person does that on those pages.

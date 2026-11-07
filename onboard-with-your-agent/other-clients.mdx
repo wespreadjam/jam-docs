@@ -1,0 +1,81 @@
+---
+title: "Other MCP clients"
+description: "Connect any MCP client to Jam: the server URL, OAuth discovery for clients that sign in, and the header for clients that take a key."
+---
+
+The Jam MCP server speaks Streamable HTTP at one URL:
+
+```text
+https://api.spreadjam.com/mcp
+```
+
+It is stateless: every request stands alone, so there is no session to keep open. Each tool call runs the matching REST route with your credentials, so limits, plan checks and error bodies are the same as the [API](/api-reference/overview).
+
+## Clients that sign in (OAuth)
+
+Point the client at the URL and choose OAuth. A request without a token answers `401` with a `WWW-Authenticate` header that names the metadata, and the client takes it from there:
+
+|                               |                                                                                                               |
+| ----------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| Protected resource metadata   | `https://api.spreadjam.com/.well-known/oauth-protected-resource` (also at `.../oauth-protected-resource/mcp`) |
+| Authorization server metadata | `https://api.spreadjam.com/.well-known/oauth-authorization-server`                                            |
+| Dynamic client registration   | `POST https://api.spreadjam.com/oauth/register`                                                               |
+| Authorize                     | `https://api.spreadjam.com/oauth/authorize`                                                                   |
+| Token                         | `https://api.spreadjam.com/oauth/token`                                                                       |
+| Revoke                        | `https://api.spreadjam.com/oauth/revoke`                                                                      |
+
+What Jam accepts:
+
+- Public clients only (no client secret), with PKCE `S256`.
+- Redirect addresses that are `https`, or `http` on `localhost`, `127.0.0.1` or `[::1]` (any port). Custom schemes such as `myapp://` are refused; use a key for those clients.
+- Grants: `authorization_code` and `refresh_token`. There are no scopes: a connection can do what its owner can do in the workspace.
+- Access tokens last one hour. Refresh tokens last 30 days and are single use; each refresh returns a new pair.
+
+## Clients that take a key
+
+Create a key in **Settings**, **Developer**, **Create API key**, and send it as a header:
+
+```http
+Authorization: Bearer sk_...
+```
+
+Most clients put this in their config next to the URL, for example:
+
+```json
+{
+  "mcpServers": {
+    "jam": {
+      "url": "https://api.spreadjam.com/mcp",
+      "headers": { "Authorization": "Bearer sk_..." }
+    }
+  }
+}
+```
+
+A client that only runs local (stdio) servers can reach Jam through a bridge such as `mcp-remote`:
+
+```json
+{
+  "mcpServers": {
+    "jam": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-remote",
+        "https://api.spreadjam.com/mcp",
+        "--header",
+        "Authorization: Bearer ${JAM_API_KEY}"
+      ],
+      "env": { "JAM_API_KEY": "sk_..." }
+    }
+  }
+}
+```
+
+## No MCP at all
+
+Every tool is a REST route. Call `https://api.spreadjam.com/v1` with the same header, using the [OpenAPI spec](https://api.spreadjam.com/openapi.json) to build requests. See [API overview](/api-reference/overview).
+
+## No account yet
+
+An agent with no key can set Jam up for its human and get a key once they approve. See [Agent connect](/onboard-with-your-agent/agent-connect).

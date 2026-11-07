@@ -1,0 +1,45 @@
+---
+title: "Prompts"
+description: "Prompts are the questions Jam asks AI assistants for you. Choose them, edit them, and stay within your plan's capacity."
+---
+
+A prompt is a question a buyer asks an AI assistant, like "best invoicing tool for small agencies". Jam asks every tracked prompt on every platform on every scan.
+
+## Prompt capacity
+
+Your plan sets how many prompts you can track, from 50 to 1,000 in steps of 50. `get_prompt_cap` shows the cap and how much room is left. Adding past the cap is refused.
+
+## Topics and personas
+
+Every prompt has a `topic` (prompts without one go under "General") and a `persona`. The API also accepts `control`, which setup treats like `branded`.
+
+| Persona      | Who asks it                                              |
+| ------------ | -------------------------------------------------------- |
+| `discoverer` | Someone exploring the problem. The default.              |
+| `buyer`      | Someone ready to choose a product.                       |
+| `evaluator`  | Someone comparing options in detail.                     |
+| `competitor` | A question that names a competitor. Tracked, not scored. |
+| `branded`    | A question that names you. Tracked, not scored.          |
+
+Topic and persona are set when a prompt is added. Rewording a prompt keeps them; to change either, remove the prompt and add it again.
+
+## Change what is tracked
+
+Edit prompts on the dashboard's prompts page, or over the API and MCP:
+
+| Do | Tools |
+| --- | --- |
+| Add one or many | `add_prompt`, `add_prompts_bulk` |
+| Reword in place (history kept) | `edit_prompt`, `edit_prompts_bulk` |
+| Replace (history reset) | `replace_prompt` |
+| Pause or resume | `pause_prompt` |
+| Stop tracking one, or a whole topic | `remove_prompt`, `remove_prompt_topic` |
+| Ask Jam for more | `suggest_prompts`, then `get_prompt_suggestion` for progress |
+
+`add_prompt` takes 3 to 500 characters and is safe to retry: a text the project already tracks answers `200` with `existing: true`. Setup (and agent connect) asks for 8 to 300 characters and at most 15 topics.
+
+<Tip>
+  Write prompts the way a buyer would type them, without your brand name.
+  Branded and competitor questions are worth tracking, but they do not move your
+  visibility score.
+</Tip>

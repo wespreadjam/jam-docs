@@ -1,0 +1,39 @@
+---
+title: "The Plan"
+description: "The Plan is the ranked list of actions that should raise your AI visibility: pages to write or fix, technical changes, sources to earn and people to pitch."
+---
+
+Research writes the Plan. Each action says what to do, why (the evidence from the answers and sources), which tracked prompts it should move and which page it targets.
+
+## Kinds of action
+
+| Kind                   | What it is                                                   | Who can do it                                                      |
+| ---------------------- | ------------------------------------------------------------ | ------------------------------------------------------------------ |
+| `new_page` | A page to publish, such as a comparison or a guide. | Jam drafts it, or your agent writes it. |
+| `page_edit` | A change to a page already on your site. | Jam prepares the code change, or your agent makes it. |
+| `technical` | A technical fix on your site. | Jam prepares the code change, or your agent makes it. |
+| `outreach` | Pitch a third-party list or page. | Your agent or you, from `agentPrompt`. A Send to Jam run can draft it. |
+| `community` | Take part in a community thread. | Your agent or you. A Send to Jam run can draft it. |
+
+## Status
+
+| Status                    | Meaning                                                          |
+| ------------------------- | ---------------------------------------------------------------- |
+| `suggested`               | On the Plan, not started.                                        |
+| `in_progress`             | Someone started it.                                              |
+| `sent`                    | Outreach went out; waiting on the third party.                   |
+| `done`                    | Reported done.                                                   |
+| `verified` / `unverified` | Jam checked whether it took effect.                              |
+| `dismissed`               | Taken off the Plan.                                              |
+| `superseded`              | Research no longer proposes it. Hidden from the list by default. |
+
+Transitions are safe to repeat: starting a started action, or dismissing a dismissed one, changes nothing. To take a started action off the Plan, dismiss it; restoring it puts it back as `suggested`.
+
+## Read it from your agent
+
+- `list_actions`: the Plan, best first, with `countsByStatus` covering every page.
+- `get_action`: everything for one action, including `agentPrompt`, the instructions for your agent.
+
+Actions and opportunities are two lists over one Plan. Opportunities (`list_opportunities`) are the article pipeline behind `new_page` actions: when Jam drafts one, the action carries its `opportunityId`. Work from actions; read an opportunity only to write the article yourself from its brief.
+
+Next: [Doing the work](/actions/doing-the-work).

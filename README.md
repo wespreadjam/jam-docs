@@ -1,35 +1,30 @@
 # jam-docs
 
-Documentation site for [jam-nodes](https://github.com/wespreadjam/jam-nodes), powered by [Mintlify](https://mintlify.com).
+Source for the Jam documentation at [docs.spreadjam.com](https://docs.spreadjam.com), built with [Mintlify](https://mintlify.com).
 
-## Local Development
+## Local development
 
 ```bash
-npm i -g mint
-mint dev
+npx mint dev
 ```
 
-The docs will be available at `http://localhost:3000`.
-
-## Contributing
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b docs/my-update`)
-3. Edit or add `.mdx` files using [Mintlify MDX format](https://mintlify.com/docs/page)
-4. Preview locally with `mint dev`
-5. Submit a pull request
+The docs are served at `http://localhost:3000`. Check them with `npx mint validate` and `npx mint broken-links`.
 
 ## Structure
 
 ```
-├── index.mdx              # Introduction
-├── quickstart.mdx          # Quick start guide
-├── creating-nodes.mdx      # Custom node guide
-├── mcp.mdx                 # MCP server integration
-├── core/                   # Core API reference
-├── nodes/                  # Built-in nodes reference
-├── editor/                 # Visual editor reference
-└── docs.json               # Mintlify configuration
+├── index.mdx                    # Introduction
+├── get-started/                 # Quickstart, concepts
+├── onboard-with-your-agent.mdx  # Connecting agents (overview)
+├── onboard-with-your-agent/     # Claude, Claude Code, ChatGPT, Cursor, other clients, agent connect, copy prompt
+├── tracking/                    # Prompts, scans, answers, analytics
+├── research/
+├── actions/                     # The Plan, doing the work
+├── delivery/                    # GitHub, Markdown
+├── api-reference/               # API overview, MCP server, errors, webhooks (endpoints come from the live OpenAPI spec)
+├── billing/
+├── style.css                    # Site styling (matches the marketing site)
+└── docs.json                    # Mintlify configuration
 ```
 
 ## License

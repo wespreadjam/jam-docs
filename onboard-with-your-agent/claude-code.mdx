@@ -1,0 +1,57 @@
+---
+title: "Claude Code"
+description: "Add the Jam MCP server to Claude Code with one command. Sign in through the browser, or send an API key."
+---
+
+<Tabs>
+  <Tab title="Sign in (OAuth)">
+    Add the server:
+
+    ```bash
+    claude mcp add --transport http jam https://api.spreadjam.com/mcp
+    ```
+
+    Then, inside Claude Code, run `/mcp`, pick **jam** and choose to authenticate. Your browser opens a Jam page: sign in, check the workspace, and approve.
+
+    Claude Code receives the sign-in on your own machine (a `localhost` address), so the Jam page shows a note that you are being sent back to a local app. That is expected here; decline if you did not start the sign-in yourself.
+
+  </Tab>
+  <Tab title="API key">
+    Create a key in Jam under **Settings**, **Developer**, **Create API key**, then:
+
+    ```bash
+    export JAM_API_KEY=sk_...
+    claude mcp add --transport http jam https://api.spreadjam.com/mcp \
+      --header "Authorization: Bearer $JAM_API_KEY"
+    ```
+
+    The key is shown once. Keep it out of files you commit.
+
+  </Tab>
+</Tabs>
+
+Add `--scope user` to use Jam in every project, or `--scope project` to share the server (not the key) with your team through `.mcp.json`.
+
+## Check it works
+
+```text
+> Which Jam workspace are you connected to, and what is first on our Plan?
+```
+
+Claude Code calls `get_me`, then `list_actions`.
+
+## Several sites
+
+If your workspace tracks more than one site, pass `projectId` (an id from `list_projects`) to any project tool, or add the header to the connection:
+
+```bash
+claude mcp add --transport http jam-acme https://api.spreadjam.com/mcp \
+  --header "Authorization: Bearer $JAM_API_KEY" \
+  --header "X-Jam-Project: <projectId>"
+```
+
+Without either, tools act on your newest project.
+
+## Give it the playbook
+
+Paste the [operating guide](/onboard-with-your-agent/operating-guide) into your `CLAUDE.md` so Claude Code works Jam in the right order and asks before spending credits.

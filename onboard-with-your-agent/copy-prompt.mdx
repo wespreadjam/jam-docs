@@ -1,0 +1,45 @@
+---
+title: "Copy prompt"
+description: "Every action in the dashboard has a Copy prompt button. It copies the instructions an agent needs to do that one job through the Jam API, with a key if you want one."
+---
+
+**Copy prompt** sits next to **Send to Jam** on every action on the Plan. Send to Jam has Jam do the work. Copy prompt hands it to your own agent instead: Claude Code, Cursor, ChatGPT or anything else that can make HTTP requests. The agent does not need the MCP server.
+
+## What gets copied
+
+The prompt is written for the job in front of you:
+
+| Where                                  | What the agent is asked to do                                                                                                           |
+| -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| An action on the Plan                  | Do that action from its brief, then report it done through the completion link in the prompt. No key needed. |
+| An article to write                    | Write one article from its brief and store it in Jam as a draft. The prompt names the title, topic, audience, brand voice and language. |
+| A drafted page with no delivery method | Add the page to your site yourself.                                                                                                     |
+
+Each prompt says where to send the result, so the work lands back in Jam.
+
+## The key
+
+The article prompt tells the agent to call the Jam API, which needs a key for your workspace. If the workspace has no key yet, Jam asks first:
+
+- **Create key**: Jam creates a key named "Agent prompt" and writes it into the copied prompt. The key is shown once; save it if your agent will need it again.
+- **Copy without key**: the prompt has `<YOUR_JAM_API_KEY>` where the key goes. Add one later from **Settings**, **Developer**.
+
+If the workspace already has a key, the prompt is copied with the placeholder, so no key is copied without you asking.
+
+<Warning>
+  A prompt with a key in it gives whoever holds it access to your workspace.
+  Paste it only into an agent you trust, and revoke the key in **Settings**,
+  **Developer** when you are done.
+</Warning>
+
+## Reporting the work done
+
+An action's prompt ends with a completion link for that one action, which needs no key, so any agent can report the action done with the URL of what changed. Jam then checks the page. An agent that holds a key uses `complete_action` instead.
+
+## When Jam cannot do an action
+
+Some work is yours: outreach, community posts, or a change Jam could not make. The action then offers Copy prompt as its main button, and over the API the action carries `fallback: "copy_prompt"`: hand its `agentPrompt` to your agent.
+
+## From the API
+
+The same instructions are on every action: `GET /v1/actions/{actionId}` (`get_action`) returns `agentPrompt`, which ends with the keyed `complete_action` route instead of the completion link. An agent connected over MCP can read it directly, so it does not need you to copy anything.

@@ -1,60 +1,65 @@
 ---
-title: "Platform API"
-description: "Authenticate with a workspace API key and call the Jam REST API over HTTPS."
+title: "API overview"
+description: "Authenticate with a workspace API key and call the Jam REST API over HTTPS. Every endpoint is also an MCP tool."
 ---
 
-The Jam Platform API lets you read your AI-visibility data and manage your tracked prompts and brand profile from your own scripts, dashboards, and agents. Every endpoint is documented in the **API Reference** tab, created directly from the live OpenAPI spec so it never drifts from what the API serves.
-
-## Get an API key
-
-1. Open your Jam workspace and go to **Settings**, then **Developer**.
-2. Click **Create API key** and give it a name.
-3. Copy the key. It is shown once. Keys look like `sk_` followed by 64 hex characters and reach the workspace's real data; there are no test keys.
-
-An agent can also get a key for a human with one link: see [agent connect](/agents/quickstart#1-get-an-api-key).
-
-<Note>
-  Keys are scoped to the workspace that created them. Revoking a key takes effect immediately.
-</Note>
+The Jam REST API exposes everything the dashboard does: visibility, answers, prompts, brand, research, the Plan, content, delivery, credits, billing and webhooks. Every endpoint is listed under **Endpoints** in this section, built from the live [OpenAPI spec](https://api.spreadjam.com/openapi.json), so it matches what the API serves. Try requests in the browser in the [API playground](https://www.spreadjam.com/api-playground).
 
 ## Base URL and auth
 
 ```http
-https://api.spreadjam.com
+https://api.spreadjam.com/v1
 ```
 
 Send your key as a bearer token on every request:
 
 ```http
-Authorization: Bearer $JAM_API_KEY
+Authorization: Bearer sk_...
 ```
 
-A missing or invalid key returns `401`. Every error uses the same body, with a stable `code` and a `requestId`: see [Errors and limits](/api-reference/errors).
+Create a key in **Settings**, **Developer**, **Create API key**. It is shown once. Keys look like `sk_` followed by 64 hex characters and reach the workspace's real data; there are no test keys. A key acts with its creator's role, and revoking it takes effect immediately. An agent can also get a key for its human with [agent connect](/onboard-with-your-agent/agent-connect).
+
+A missing or invalid key returns `401`. Every error uses one body with a stable `code` and a `requestId`: see [Errors and limits](/api-reference/errors).
 
 ## Try it
 
 ```bash
-export JAM_API_KEY=sk_your_key_here
+export JAM=https://api.spreadjam.com/v1
+auth=(-H "Authorization: Bearer $JAM_API_KEY")
 
-# Confirm your key and see which workspace it resolves to.
-curl -sS https://api.spreadjam.com/v1/me \
-  -H "Authorization: Bearer $JAM_API_KEY" | jq
+curl -sS "${auth[@]}" $JAM/me                  # which workspace this key is for
+curl -sS "${auth[@]}" $JAM/analytics/overview  # visibility, mentions, citations
+curl -sS "${auth[@]}" "$JAM/prompts?limit=20"  # what is tracked, one page
+curl -sS "${auth[@]}" $JAM/actions             # the Plan: what to do next
+curl -sS "${auth[@]}" $JAM/credits             # credits left and when they reset
 ```
 
-## Explore the endpoints
+Always send `limit` to `/v1/prompts`: without it the response also carries the older `tracked` and `archived` lists next to the first page, which is a few hundred KB on a large project.
 
-Browse the full, always-current reference in the **API Reference** tab. It covers your identity (`/v1/me`), AI-visibility analytics, keyword and topic rankings, your brand profile and competitors, and tracked prompts, each with parameters, response schemas, and a request builder. The machine-readable spec is served at [`https://api.spreadjam.com/openapi.json`](https://api.spreadjam.com/openapi.json).
+## Projects
 
-## Use with Claude, ChatGPT and other agents
+A project is one website Jam tracks. Project routes act on the newest active project unless you send `X-Jam-Project: <projectId>` (ids from `GET /v1/projects`). Routes for one item by id (`/v1/actions/{actionId}`, `/v1/content/{contentId}`, ...) act on that item wherever it lives in the workspace.
 
-The Jam MCP server at `https://api.spreadjam.com/mcp` exposes every endpoint as a tool.
+## Lists and pages
 
-- **Claude.ai or Claude Desktop:** **Settings**, **Connectors**, **Add custom connector**, then enter `https://api.spreadjam.com/mcp`. Claude opens a Jam page in your browser: sign in, check the workspace, and approve. No key is needed.
-- **ChatGPT:** add a connector (developer mode) with the URL `https://api.spreadjam.com/mcp` and OAuth authentication, then sign in and approve the same way.
-- **Claude Code:**
+Lists that can grow are paged the same way: `limit` (1 to 100) and `cursor` in, `pageInfo` out.
 
-  ```bash
-  claude mcp add --transport http jam https://api.spreadjam.com/mcp --header "Authorization: Bearer $JAM_API_KEY"
-  ```
+```json
+"pageInfo": { "limit": 100, "hasNextPage": true, "nextCursor": "eyJhIjo...", "totalCount": 326 }
+```
 
-A connector shows up in **Settings**, **Developer** as a key named after the client, for example "Claude (connector)". Revoke it there to disconnect. See [Quickstart for agents](/agents/quickstart) for Cursor and other clients, and [How to operate Jam](/agents/operating-guide) for instructions to give your agent.
+When `hasNextPage` is true, send `nextCursor` back as `cursor` with the same filters. `totalCount` counts every match across all pages.
+
+## Writes
+
+- Send `Idempotency-Key` on writes you might retry.
+- Work that hands off to Jam answers `202`; read the result back from the resource it names.
+- Writes need an active plan. When a plan ends, writes answer `402 plan_inactive`; see [Plans and credits](/billing/plans-and-credits).
+
+## Use it from an agent
+
+The [MCP server](/api-reference/mcp) at `https://api.spreadjam.com/mcp` turns every endpoint into a tool, with the same auth, limits and errors. See [Onboard with your agent](/onboard-with-your-agent).
+
+<Tip>
+**Python: set a `User-Agent` header.** The API sits behind Cloudflare, which blocks the default `Python-urllib/3.x` user agent with `403` ("error code: 1010"). Send your own, for example `{"User-Agent": "my-agent/1.0"}`.
+</Tip>

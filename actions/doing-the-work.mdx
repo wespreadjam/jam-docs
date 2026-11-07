@@ -1,0 +1,34 @@
+---
+title: "Doing the work"
+description: "Do an action three ways: send it to Jam, copy its prompt into your own agent, or do it yourself. Then report it done so Jam can check it."
+---
+
+Every action on the Plan has two buttons side by side: **Send to Jam** has Jam do it, and **Copy prompt** hands it to your own agent. Each action also has its own page with the evidence, the article or the change, and its history.
+
+## Send to Jam
+
+Jam starts a background agent run on the action, in its own chat, so you can follow it and answer if it needs you.
+
+- A `new_page` action is researched and written as a draft. Drafting is metered: a page is charged what its writing cost, about 65 credits for an agent run (about 45 for a one-shot draft). Credits for the most it may cost are held at the start and the rest is returned; nothing is charged when no page is saved.
+- A `page_edit` or `technical` action gets a prepared code change to preview. A content-only change may get its pull request opened by the run; anything touching code stops at the change, for you to open with **Make PR** (20 credits, kept only if the pull request opens).
+- Outreach and community actions get a drafted pitch or reply for you to send.
+
+From the API: `create_action_execution` with `{"mode": "agent"}`. It answers `202` with `runId` and `chatUrl`. Without a body it does the one-shot version: a draft for a `new_page`, a prepared change (`changeId`) for a `page_edit` or `technical` action, and `422` for outreach and community.
+
+## Copy prompt
+
+Copies the action's instructions for any agent: what to do, the evidence, the target page, and a link to report it done that needs no API key. See [Copy prompt](/onboard-with-your-agent/copy-prompt).
+
+## Do it yourself
+
+Read the action's page (or `get_action`), make the change, then press **Mark done** and give the URL of what changed.
+
+## Report it done
+
+Reporting an action done (**Mark done**, `complete_action`, or the link in a copied prompt) records `done`, optionally with the URL of the finished work. Jam then checks the page once and marks the action `verified` or `unverified`. **Check again** (`check_action_again`) checks a `done` or `unverified` action once more.
+
+For outreach, report the pitch sent with `report_action_sent` (status `sent`); Jam then watches the list for your brand.
+
+## Many at once
+
+`create_plan_batch` (Plan now) drafts the top open Plan articles in the background, 3 by default and up to 20. Credits are the only limit.

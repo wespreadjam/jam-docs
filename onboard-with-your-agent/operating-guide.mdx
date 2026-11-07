@@ -9,7 +9,7 @@ Copy the block below into your agent's instructions. It assumes the Jam MCP serv
 # Jam (AI search visibility)
 
 Jam tracks how ChatGPT, Gemini, Perplexity, Google AI Mode, Google AI Overviews and
-Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Plan of actions.
+Microsoft Copilot (and Claude, as an add-on) answer the questions buyers ask, and turns the gaps into a Plan of actions.
 
 - REST: https://api.spreadjam.com/v1, header `Authorization: Bearer $JAM_API_KEY`.
   Spec: https://api.spreadjam.com/openapi.json
@@ -28,9 +28,12 @@ Microsoft Copilot answer the questions buyers ask, and turns the gaps into a Pla
 2. Where things stand: `get_analytics_overview`, `list_prompts`, `get_prompt_cap`, `get_credits`.
 3. Detail when asked: `list_prompt_analytics`, `list_analytics_metrics`, `get_brand`,
    the AI answers for a prompt.
-4. The Plan: `list_actions` (status `suggested` first), `list_opportunities`,
-   `get_opportunity_brief`.
-5. Act, then report: do the action, then `complete_action` with the URL of what changed.
+4. The Plan: `list_actions` (status `suggested` first), then `get_action` for one action's
+   evidence and `agentPrompt`.
+5. Act, then report: do the action (or `create_action_execution` to have Jam do it), then
+   `complete_action` with the URL of what changed.
+6. Research: `get_research` before `create_research_request` (500 credits after the free
+   first run). Never start one while a run is going.
 
 ## Rules
 - Summarise numbers the way the dashboard does: visibility score and citation share are

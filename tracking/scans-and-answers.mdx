@@ -1,0 +1,39 @@
+---
+title: "Scans and answers"
+description: "How a visibility scan runs, how to follow its progress, and what Jam records about each AI answer."
+---
+
+## Scans
+
+A scan (a visibility run) asks every tracked prompt on every platform your plan covers. Scans run on your plan's cadence and use no credits.
+
+To scan now, use the dashboard or `create_visibility_run` (`POST /v1/visibility-runs`). It answers `202` with a `runId` and `expectedMinutes`, or `409` while a scan is already running: wait for that one instead of starting another.
+
+A run fills in as Jam queues its questions, so `answers.total` grows during the first minutes. Read progress against `expectedTotal`, the prompt and platform pairs the run will ask, which is known up front; `queuing` stays `true` until every question is queued. Follow a run with `get_visibility_run`, and list past runs with `list_visibility_runs`.
+
+A platform that could not be reached shows its failed answers with a plain cause in `platforms[].errors`. When a platform failed most of the latest scan, the project's `healthReasons` names it.
+
+## Answers
+
+For every prompt and platform, each scan stores:
+
+- the full answer text,
+- whether your brand was mentioned and whether it was recommended, and its position,
+- the brands mentioned, in order,
+- the URLs cited.
+
+`list_answers` (`GET /v1/answers`) lists them newest first; `list_prompt_answers` is one prompt's history. Answers are the evidence for everything else: research reads them, and each action on the Plan links to the answers behind it.
+
+## Analytics
+
+The dashboard's numbers come from the answers in a window of 7, 30 or 90 days (`rangeDays`).
+
+| `list_analytics_metrics` family | One row per                                                                                             |
+| ------------------------------- | ------------------------------------------------------------------------------------------------------- |
+| `visibility`, `competitors`     | Day and brand: the visibility score over the window.                                                    |
+| `citations`                     | Tracked brand (yours and competitors): its citation share, mentions and rank.                           |
+| `sources`                       | Cited domain: how many cited URLs and answers it appears in, with your own site marked `isOwned: true`. |
+| `platforms`                     | AI platform: its scores, answer count and latest-scan failures.                                         |
+| `topics`                        | Topic and brand: visibility within the topic.                                                           |
+
+`citations` answers "which brands get cited"; `sources` answers "which sites the AI assistants cite". The first analytics read of a project can take several seconds while Jam builds its numbers; later reads are fast until a new scan lands.

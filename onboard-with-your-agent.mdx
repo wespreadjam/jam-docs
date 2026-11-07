@@ -1,0 +1,50 @@
+---
+title: "Onboard with your agent"
+sidebarTitle: "Overview"
+description: "Connect Claude, Claude Code, ChatGPT, Cursor or any MCP client to Jam. Your agent can then read the Plan, run research and ship the work."
+---
+
+Jam is built to be used from an agent. Everything in the dashboard is a tool on the Jam MCP server and a route on the REST API, so your agent can set Jam up, read where you stand, and do the work on the Plan.
+
+|              |                                                                                    |
+| ------------ | ---------------------------------------------------------------------------------- |
+| MCP server   | `https://api.spreadjam.com/mcp` (Streamable HTTP)                                  |
+| REST API     | `https://api.spreadjam.com/v1`                                                     |
+| OpenAPI spec | [`https://api.spreadjam.com/openapi.json`](https://api.spreadjam.com/openapi.json) |
+
+## Pick your client
+
+<CardGroup cols={2}>
+  <Card title="Claude" href="/onboard-with-your-agent/claude">
+    Claude.ai and Claude Desktop. Add a custom connector and sign in.
+  </Card>
+  <Card title="Claude Code" href="/onboard-with-your-agent/claude-code">
+    One command. Sign in in the browser, or use an API key.
+  </Card>
+  <Card title="ChatGPT" href="/onboard-with-your-agent/chatgpt">
+    Add a connector in developer mode and sign in.
+  </Card>
+  <Card title="Cursor" href="/onboard-with-your-agent/cursor">
+    Add the server to `mcp.json` with an API key.
+  </Card>
+  <Card title="Other MCP clients" href="/onboard-with-your-agent/other-clients">
+    Any client that speaks Streamable HTTP, with OAuth or a key.
+  </Card>
+  <Card title="No account yet" href="/onboard-with-your-agent/agent-connect">
+    Your agent sets Jam up for you and sends you one link to approve.
+  </Card>
+</CardGroup>
+
+## Two ways to sign in
+
+**OAuth (no key to paste).** The client opens a Jam page in your browser. You sign in (or sign up and choose a plan), check the workspace and where you will be sent back to, and approve. Jam supports OAuth 2.1 with dynamic client registration and PKCE, so any MCP client that can sign in to a remote server works this way, as long as its sign-in returns to an `https` address or to `localhost`.
+
+**API key.** Create one in **Settings**, **Developer**, **Create API key**. It is shown once. Keys look like `sk_` followed by 64 hex characters. The client sends it on every request as `Authorization: Bearer sk_...`.
+
+Either way the connection belongs to one workspace and acts with your role in it. An OAuth sign-in shows up in **Settings**, **Developer** as a key named after the client, for example "Claude (connector)". Revoke it there to disconnect.
+
+## Then what
+
+Once connected, ask your agent something like "How visible are we in AI answers, and what should we do first?" See [What your agent can do](/onboard-with-your-agent/what-your-agent-can-do) for the order of work, and the [operating guide](/onboard-with-your-agent/operating-guide) for instructions to paste into your agent's context.
+
+Already using the dashboard? Every action has a **Copy prompt** button that hands one job to any agent, connected or not. See [Copy prompt](/onboard-with-your-agent/copy-prompt).

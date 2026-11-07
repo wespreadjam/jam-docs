@@ -1,0 +1,128 @@
+---
+title: "Agent connect"
+description: "An agent with no Jam account or key sets Jam up for its human, sends them one link to review and approve, and receives an API key."
+---
+
+Agent connect is for an agent whose human has no Jam account yet, or no key to hand over. The agent starts a session without a key, sends the human one link, and polls until it receives an API key for the workspace they approved. It can also do the whole setup (site, brand, audiences, competitors, prompts and plan), so the human only reviews, starts the trial and approves.
+
+For a human who already uses Jam, [signing in from the client](/onboard-with-your-agent) or a key from **Settings**, **Developer** is simpler.
+
+## Start a session
+
+The agent starts a session. No key is needed for this call.
+
+```bash
+curl -sS -X POST https://api.spreadjam.com/v1/agent-connect \
+  -H "Content-Type: application/json" \
+  -d '{"domain": "acme.com", "agentName": "Claude Code"}'
+```
+
+```json
+{
+  "connectUrl": "https://www.spreadjam.com/connect/ABCD234567",
+  "userCode": "K7M-Q2X",
+  "pollToken": "jcp_...",
+  "expiresAt": "2026-11-04T12:00:00.000Z",
+  "intervalSeconds": 5
+}
+```
+
+`agentName` is optional (1 to 60 printable characters; without it the page says "Your agent"). `domain` is optional and must be a website hostname such as `acme.com`. `email` is optional too: the human's email, if you know it. Anything else is a `400 invalid_request` whose `details` names the field.
+
+Give the human the `connectUrl` and the `userCode` together, for example: "Open this link and check that it shows the code K7M-Q2X." The approval page shows the same code, the email they are signed in with and the workspace the key will belong to (they can switch to another of their workspaces there). They sign up or sign in, set up their site (the domain you sent is filled in), choose a plan, and approve. If they already use Jam, they only approve. After they approve, the page tells them to return to you while you finish connecting.
+
+Keep the `pollToken` secret, and poll every `intervalSeconds`:
+
+```bash
+curl -sS https://api.spreadjam.com/v1/agent-connect/$POLL_TOKEN
+```
+
+| `status` | Meaning |
+| --- | --- |
+| `pending` | Not done yet. `stage` says what is left: `awaiting_signin`, `awaiting_review`, `awaiting_payment` (approved, the trial has not started) or `setting_up` (paid, the project is being created). Poll again. |
+| `approved` | The response carries `apiKey` and `workspaceId`. This is the only time the key is shown: store it now. |
+| `consumed` | The key was already handed out. Start a new session if it was lost. |
+| `denied` | The human declined. |
+| `expired` | Nobody approved within two hours. Start a new session. |
+
+Starting sessions is limited to 10 per IP address every 10 minutes.
+
+## Set Jam up for them (recommended)
+
+You can do the setup yourself, so the human only reviews, pays and approves. Read the plans first (no key needed):
+
+```bash
+curl -sS https://api.spreadjam.com/v1/pricing
+curl -sS "https://api.spreadjam.com/v1/pricing?promptCapacity=100&cadence=weekly&platforms=chatgpt,gemini,perplexity,google_ai_overview"
+```
+
+The first lists prompt capacities (50 to 1,000 in steps of 50), scan cadences, platforms, work credits, the monthly price of every capacity and cadence, and the trial terms (14 days for a new account, card required). The second quotes one configuration. These are the prices the plan page shows.
+
+Then send the setup as `onboarding`:
+
+```bash
+curl -sS -X POST https://api.spreadjam.com/v1/agent-connect \
+  -H "Content-Type: application/json" \
+  -d '{
+    "agentName": "Claude Code",
+    "email": "founder@acme.com",
+    "onboarding": {
+      "site": "acme.com",
+      "brandName": "Acme",
+      "description": "Acme is invoicing and time tracking software for agencies of 5 to 50 people that bill clients by the hour.",
+      "audience": [
+        { "title": "Agency owners", "blurb": "Run a 5 to 50 person services agency" },
+        { "title": "Operations leads", "blurb": "Own billing and time tracking at an agency" }
+      ],
+      "competitors": [
+        { "name": "Harvest", "domain": "getharvest.com" },
+        { "name": "FreshBooks", "domain": "freshbooks.com" }
+      ],
+      "prompts": [
+        { "text": "best invoicing software for small agencies", "topic": "Agency invoicing", "persona": "buyer" },
+        { "text": "Harvest vs FreshBooks for agency time billing", "topic": "Time billing", "persona": "competitor" },
+        { "text": "how should a 20 person agency track billable hours", "topic": "Time billing", "audience": "Operations leads" }
+      ],
+      "locale": "us-en",
+      "plan": {
+        "promptCapacity": 100,
+        "cadence": "weekly",
+        "platforms": ["chatgpt", "gemini", "perplexity", "google_ai_overview"]
+      }
+    }
+  }'
+```
+
+The answer adds `reviewUrl` (the same link as `connectUrl`), the quoted `plan` and the prompt count:
+
+```json
+{
+  "connectUrl": "https://www.spreadjam.com/connect/ABCD234567",
+  "reviewUrl": "https://www.spreadjam.com/connect/ABCD234567",
+  "userCode": "K7M-Q2X",
+  "pollToken": "jcp_...",
+  "expiresAt": "2026-11-04T12:00:00.000Z",
+  "intervalSeconds": 5,
+  "plan": {
+    "configuration": { "promptCapacity": 100, "cadence": "weekly", "platforms": ["chatgpt", "gemini", "perplexity", "google_ai_overview"], "workCredits": 2000 },
+    "currency": "usd",
+    "monthlyCents": 18600,
+    "monthlyUsd": 186
+  },
+  "prompts": { "count": 3, "suggestedByJam": false }
+}
+```
+
+Every field is optional except the site (`onboarding.site`, or `domain`). The rules are the ones onboarding applies: `brandName` and `description` together (description 20 to 2,000 characters), 1 to 5 audiences, up to 25 competitors (never the site itself), prompts of 8 to 300 characters with no duplicates, at most 15 topics and at most `plan.promptCapacity` prompts. A prompt without `topic` goes under "General"; `persona` is one of `discoverer` (default), `buyer`, `evaluator`, `competitor`, `branded`; `audience` names one of your audience titles. Leave out `prompts` and Jam suggests them from the site, and the human reviews them before the trial. Anything that breaks a rule is a `400 invalid_request` whose `details` names the field, for example `onboarding.prompts.2`.
+
+The link then opens one review page instead of the onboarding steps: the code, the site, the brand, audiences, competitors, prompts, the plan with its price (the human can change it), what the key can do, and one button, "Approve Claude Code and start trial", which opens checkout. Tell the human what to expect, for example: "Open this link, check the code K7M-Q2X, review the setup and press Approve. Checkout asks for a card; the trial is free for 14 days." While you poll, `stage` tells you what is left; the key arrives on the first poll after the trial has started and the project exists, with no second approval. If the human already has a Jam workspace with an active plan or a finished project, they approve for that workspace and your setup is not applied. A workspace left unpaid from an earlier attempt still gets your setup. While the human has approved but not paid, the poll returns `reason`, `resumeUrl` and `humanMessage`: pass the message and link on so they can finish checkout; the session waits 24 hours after approval.
+
+<Tip>
+**Python: set a `User-Agent` header.** The API sits behind Cloudflare, which blocks the default `Python-urllib/3.x` user agent with `403` ("error code: 1010"). Send your own, for example `urllib.request.Request(url, headers={"User-Agent": "my-agent/1.0"})`, and do the same with any HTTP client whose requests come back `403` with that body.
+</Tip>
+
+## The key
+
+Keys look like `sk_` followed by 64 hex characters. A key reaches its workspace's real data; there are no test keys. It can read everything in the workspace and make the changes its creator can make in the dashboard, including work that spends credits. It acts with its creator's role, so a member's key cannot do owner-only things such as managing billing. Revoke a key in **Settings**, **Developer** (a key can also revoke itself with `DELETE /v1/api-keys/{keyId}`).
+
+Next: [connect the MCP server](/onboard-with-your-agent/other-clients) with the key, and read [What your agent can do](/onboard-with-your-agent/what-your-agent-can-do).

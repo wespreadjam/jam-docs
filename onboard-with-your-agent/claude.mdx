@@ -1,0 +1,36 @@
+---
+title: "Claude"
+description: "Connect Jam to Claude.ai or Claude Desktop as a custom connector. You sign in with your Jam account; there is no key to paste."
+---
+
+<Steps>
+  <Step title="Add the connector">
+    In Claude, open **Settings**, **Connectors**, **Add custom connector**. Name it Jam and enter the URL:
+
+    ```text
+    https://api.spreadjam.com/mcp
+    ```
+
+  </Step>
+  <Step title="Sign in to Jam">
+    Claude opens a Jam page in your browser. Sign in, or sign up and choose a plan if you are new. The page shows the email you are signed in with, the workspace the connection will belong to (you can switch to another of your workspaces there) and where you will be sent back to.
+  </Step>
+  <Step title="Approve">
+    Press approve. Claude finishes connecting and lists the Jam tools.
+  </Step>
+</Steps>
+
+The sign-in request waits up to two hours, so there is time to sign up and pay before approving.
+
+## Check it works
+
+Ask Claude: "Use Jam to tell me which workspace you are connected to and how visible we are." It calls `get_me` and `get_analytics_overview`.
+
+## Disconnect
+
+The connection appears in Jam under **Settings**, **Developer** as a key named "Claude (connector)". Revoke it there to end the connection; Claude has to sign in again to reconnect. Removing the connector in Claude also stops it from calling Jam.
+
+## Good to know
+
+- Claude stays signed in: each access token lasts an hour and renews by itself. If the connection goes unused for 30 days, sign in again. A renewal token that is used twice is treated as stolen and ends the connection.
+- Tools that spend credits, publish or delete are marked as destructive, so Claude can ask before using them. Reads are marked read only.

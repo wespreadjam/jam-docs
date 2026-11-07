@@ -1,0 +1,34 @@
+---
+title: "Research"
+sidebarTitle: "Overview"
+description: "Research reads the AI answers to work out what to change: which pages AI assistants trust, which sources cite your competitors, and where you are missing. It writes the Plan."
+---
+
+Research is how Jam goes from numbers to work. It reads the answers from your scans, looks at the pages and sources the assistants cite, and proposes actions, best first, each with its evidence and the prompts it should move. Those actions are [the Plan](/actions/the-plan).
+
+## When it runs
+
+- **The first run** starts once the first scan has finished. It is part of setting up the project and costs nothing.
+- **Research again** reruns it and rewrites the Plan. Each later run holds 500 credits, kept only if the run succeeds and refunded otherwise. A run takes about ten minutes.
+
+When the first run finishes, Jam also drafts up to three of the top new pages by itself, once per project, from your plan's credits. They are written one after another, about five minutes each. The drafts stay in Jam until someone publishes them; nothing is sent to your site.
+
+## From the dashboard
+
+Use **Research again** on the Plan. The button shows what it costs, or that the run is free.
+
+## From your agent
+
+| Tool                      | Route                        | What it does                                                                                                                            |
+| ------------------------- | ---------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- |
+| `get_research`            | `GET /v1/research`           | Whether a run is going, how the last one ended, and whether Research again would be accepted now and what it would cost.                |
+| `get_research_report`     | `GET /v1/research/report`    | What the latest successful run found: how many answers it read and every action it proposed, with its why, evidence and target prompts. |
+| `create_research_request` | `POST /v1/research-requests` | Research again. Poll `get_research` until it finishes.                                                                                  |
+
+`create_research_request` answers `409` while a run is in flight or before the first scan has finished, `402` when credits cannot cover it, and `403` when your plan does not include research.
+
+<Tip>
+  Research again is worth running after you ship several actions or change what
+  you track. Ask your agent to check `get_research` first, so it does not spend
+  credits while a run is already going.
+</Tip>

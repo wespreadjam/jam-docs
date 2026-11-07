@@ -1,0 +1,49 @@
+---
+title: "MCP server"
+description: "The Jam MCP server at https://api.spreadjam.com/mcp: one tool per API route, OAuth or key auth, tool annotations and project selection."
+---
+
+```text
+https://api.spreadjam.com/mcp
+```
+
+A remote MCP server over Streamable HTTP. It is stateless: each request stands alone, and `GET` and `DELETE` on the endpoint answer `405`.
+
+## Tools
+
+There is one tool per REST route, named by its operation id: `get_me`, `get_analytics_overview`, `list_prompts`, `list_actions`, `get_action`, `create_research_request`, `publish_content` and so on. A tool's input is the route's path and query parameters and JSON body, merged. Each tool call runs the REST route with your credentials, so validation, plan checks, rate limits and error bodies are exactly the REST ones. The full descriptions are in the [endpoint reference](/api-reference/overview) and the [OpenAPI spec](https://api.spreadjam.com/openapi.json).
+
+A few routes are not tools, because a connected agent can never use them: `create_api_key`, the key-less `start_agent_connect` and `get_agent_connect`, and `complete_action_with_token`.
+
+The server also sends instructions your client shows its model: a good order of work, starting with `get_me`. See [What your agent can do](/onboard-with-your-agent/what-your-agent-can-do).
+
+## Auth
+
+Send either:
+
+- an API key: `Authorization: Bearer sk_...`, or
+- an OAuth access token, which clients that sign in get for you. See [Other MCP clients](/onboard-with-your-agent/other-clients#clients-that-sign-in-oauth) for the endpoints.
+
+A request without a usable token answers `401` with `WWW-Authenticate: Bearer resource_metadata="https://api.spreadjam.com/.well-known/oauth-protected-resource"`.
+
+## Annotations
+
+| Hint                    | Set on                                                                                                                                                                           |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `readOnlyHint: true`    | Every read (`GET`).                                                                                                                                                              |
+| `destructiveHint: true` | Tools that spend credits, publish, or delete. A tool that spends credits starts its description with the cost, for example "Costs 500 credits (the first research run is free)." |
+| `idempotentHint: true`  | Reads, `PUT` and `PATCH`, and a few safe `POST`s (`add_prompt`, `pause_prompt`, `start_action`, `dismiss_action`, `dismiss_opportunity`).                                        |
+
+`openWorldHint` is `false` on every tool.
+
+## Projects
+
+Tools under a project route take an optional `projectId` (an id from `list_projects`), sent for that one call. To pin a whole connection to one project, send `X-Jam-Project: <projectId>` with it. The argument wins. Without either, tools act on the newest project.
+
+## Errors
+
+A failed call comes back as a tool result with `isError: true` and the REST error body as its text. A tool called without a required path argument (for example `get_action` with no `actionId`) answers `invalid_request` before any request is made. See [Errors and limits](/api-reference/errors).
+
+## Searching these docs
+
+This docs site has its own MCP server for searching the documentation, separate from the Jam server above. Use the **Copy page** menu at the top of any page to connect it.
