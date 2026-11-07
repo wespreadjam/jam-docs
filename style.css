@@ -1,0 +1,166 @@
+/*
+ * Jam docs: the new marketing site's look (src/components/landing-v2/landing.css in the app repo).
+ * Paper #f1f1f1, ink #3d3b4f, brand #fa114e, Geist and Geist Mono; dark paper #1c1b24, ink #ecebf2.
+ * Mintlify loads this file on every page. Prefer stable ids (#navbar, #sidebar, #content-area,
+ * #footer, #page-title) and data attributes over generated class names.
+ */
+@import url("https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500&display=swap");
+
+:root {
+  --jam-brand: #fa114e;
+  --jam-ink: #3d3b4f;
+  --jam-paper: #f1f1f1;
+  --jam-raised: #e9e9ea;
+  --jam-line: rgba(85, 83, 104, 0.3);
+  --jam-rule: rgba(85, 83, 104, 0.16);
+  --jam-muted: rgba(61, 59, 79, 0.72);
+  --jam-code-bg: #e8e8ea;
+  --jam-mono: "Geist Mono", ui-monospace, Menlo, monospace;
+}
+
+html.dark {
+  --jam-ink: #ecebf2;
+  --jam-paper: #1c1b24;
+  --jam-raised: #24232e;
+  --jam-line: rgba(236, 235, 242, 0.18);
+  --jam-rule: rgba(236, 235, 242, 0.12);
+  --jam-muted: rgba(236, 235, 242, 0.62);
+  --jam-code-bg: #24232e;
+}
+
+/* Text in the ink colour, not pure black or white. */
+body,
+#content-area,
+#page-title,
+#content-area h1,
+#content-area h2,
+#content-area h3,
+#content-area h4 {
+  color: var(--jam-ink);
+}
+
+#content-area p,
+#content-area li,
+#content-area td {
+  color: var(--jam-ink);
+}
+
+/* Headings: Geist 500 with the site's tight tracking. */
+#page-title,
+#content-area h1,
+#content-area h2,
+#content-area h3 {
+  letter-spacing: -0.025em;
+  font-weight: 500;
+}
+
+#page-title {
+  letter-spacing: -0.035em;
+}
+
+/* Navbar on paper with a hairline rule, like the site's nav. */
+#navbar {
+  background: var(--jam-paper);
+  border-bottom: 1px solid var(--jam-rule);
+}
+
+/* Mono for every kind of code, as the site uses Geist Mono for labels and code. */
+code,
+pre,
+kbd,
+pre code,
+[data-component-part="code-block-root"] {
+  font-family: var(--jam-mono) !important;
+}
+
+/* Inline code: a quiet raised chip, ink text. */
+#content-area :not(pre) > code {
+  background: var(--jam-code-bg);
+  color: var(--jam-ink);
+  border: 1px solid var(--jam-rule);
+  border-radius: 3px;
+  padding: 0.1em 0.35em;
+  font-size: 0.875em;
+}
+
+/* Code blocks: bordered, square-ish corners, raised paper instead of a black slab. */
+#content-area pre,
+#content-area .code-block,
+#content-area [data-component-part="code-block-root"],
+#content-area .code-group {
+  border-radius: 3px !important;
+}
+
+html:not(.dark) #content-area pre,
+html:not(.dark) #content-area [data-component-part="code-block-root"] {
+  background: var(--jam-code-bg) !important;
+}
+
+html.dark #content-area pre,
+html.dark #content-area [data-component-part="code-block-root"],
+html.dark pre,
+html.dark code[class*="language-"] {
+  background: var(--jam-code-bg) !important;
+}
+
+/* Callouts: bordered containers with the brand as the only accent. */
+#content-area [data-callout] {
+  border-radius: 3px;
+}
+
+/* Cards: bordered, no shadow, brand on hover. */
+#content-area a[data-component-part="card"],
+#content-area .card {
+  border-radius: 3px;
+  box-shadow: none;
+  border-color: var(--jam-line);
+}
+
+#content-area a.card:hover,
+#content-area a[data-component-part="card"]:hover {
+  border-color: var(--jam-brand);
+}
+
+/* Tables: hairlines in the site's line colour. */
+#content-area table th,
+#content-area table td {
+  border-color: var(--jam-rule);
+}
+
+#content-area table th {
+  font-weight: 500;
+}
+
+/* Links in body text: ink with a brand underline, so long pages stay readable. */
+#content-area p a,
+#content-area li a,
+#content-area td a {
+  color: var(--jam-ink);
+  text-decoration: underline;
+  text-decoration-color: var(--jam-brand);
+  text-underline-offset: 3px;
+  border-bottom: none;
+}
+
+#content-area p a:hover,
+#content-area li a:hover,
+#content-area td a:hover {
+  color: var(--jam-brand);
+}
+
+/* Sidebar group titles in mono caps, like the site's eyebrows and labels. */
+#sidebar .sidebar-group-header,
+#sidebar [data-component-part="sidebar-group-title"] {
+  font-family: var(--jam-mono);
+  font-weight: 400;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  color: var(--jam-muted);
+}
+
+/* Buttons: the site's 3px radius. */
+#navbar a[class*="rounded"],
+#navbar button[class*="rounded"] {
+  border-radius: 3px;
+}
